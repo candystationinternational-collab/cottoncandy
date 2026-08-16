@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cartStore";
 import { useCatalog, formatPrice } from "@/lib/CatalogProvider";
+import { useAuth } from "@/lib/AuthProvider";
 import { apiClient, type Order, type ShippingAddress } from "@/lib/apiClient";
 
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
@@ -24,6 +25,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { lines, subtotal, clear } = useCart();
   const { products, bundles, deliveryZones, settings } = useCatalog();
+  const { session } = useAuth();
   const [step, setStep] = useState<Step>(1);
   const [authChoice, setAuthChoice] = useState<AuthChoice>("guest");
   const [shipping, setShipping] = useState<ShippingAddress>({
@@ -42,6 +44,17 @@ export default function CheckoutPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+  // Logged-in customers skip the guest/login/signup choice entirely — go straight to shipping.
+  useEffect(() => {
+    if (session && step === 1) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reacting to session arriving asynchronously from AuthProvider, not derivable during render
+      setEmail(session.email);
+      setShipping((s) => ({ ...s, name: s.name || session.name }));
+      setStep(2);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only react to session arriving/changing, not every step change
+  }, [session]);
 
   const effectiveZoneId = zoneId ?? deliveryZones[0]?.id;
   const zone = deliveryZones.find((z) => z.id === effectiveZoneId);
@@ -127,7 +140,8 @@ export default function CheckoutPage() {
 
   function back() {
     setErrors([]);
-    setStep((s) => Math.max(1, s - 1) as Step);
+    const floor = session ? 2 : 1;
+    setStep((s) => Math.max(floor, s - 1) as Step);
   }
 
   return (
@@ -161,7 +175,7 @@ export default function CheckoutPage() {
 
       <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
         <div>
-          {step === 1 && (
+          {step === 1 && !session && (
             <div className="space-y-4">
               <h2 className="font-display text-xl font-bold text-navy">How would you like to checkout?</h2>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -198,6 +212,11 @@ export default function CheckoutPage() {
           {step === 2 && (
             <div className="space-y-4">
               <h2 className="font-display text-xl font-bold text-navy">Shipping Details</h2>
+              {session && (
+                <p className="text-xs text-navy/50">
+                  Checking out as <span className="font-semibold text-navy">{session.name}</span> ({session.email})
+                </p>
+              )}
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Full Name" value={shipping.name} onChange={(v) => setShipping({ ...shipping, name: v })} />
                 <Field label="Phone" value={shipping.phone} onChange={(v) => setShipping({ ...shipping, phone: v })} placeholder="+977 98XXXXXXXX" />
@@ -323,7 +342,7 @@ export default function CheckoutPage() {
             <div className="mt-8 flex justify-between">
               <button
                 onClick={back}
-                disabled={step === 1}
+                disabled={step === (session ? 2 : 1)}
                 className="rounded-full border-2 border-navy px-6 py-3 text-sm font-bold text-navy disabled:opacity-30"
               >
                 Back
