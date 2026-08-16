@@ -82,6 +82,7 @@ public class CandyStationDbContext(DbContextOptions<CandyStationDbContext> optio
             e.Property(x => x.PasswordHash).HasMaxLength(256).IsRequired();
             e.Property(x => x.TotalSpent).HasColumnType("decimal(10,2)");
             e.Property(x => x.EmailVerificationToken).HasMaxLength(64);
+            e.Property(x => x.PasswordResetToken).HasMaxLength(64);
         });
 
         b.Entity<CustomerAddress>(e =>

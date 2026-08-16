@@ -21,8 +21,11 @@ public class AuthService(CandyStationDbContext db, JwtTokenService tokens, IEmai
 
     private static string NewToken() => Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
 
-    private string VerifyUrl(string token) =>
-        $"{(config["App:FrontendBaseUrl"] ?? "http://localhost:3000").TrimEnd('/')}/verify-email?token={token}";
+    private string FrontendUrl(string path, string token) =>
+        $"{(config["App:FrontendBaseUrl"] ?? "http://localhost:3000").TrimEnd('/')}/{path}?token={token}";
+
+    private string VerifyUrl(string token) => FrontendUrl("verify-email", token);
+    private string ResetUrl(string token) => FrontendUrl("reset-password", token);
 
     public async Task<RegisterResponse> RegisterAsync(RegisterRequest req)
     {
@@ -89,6 +92,31 @@ public class AuthService(CandyStationDbContext db, JwtTokenService tokens, IEmai
 
         var (subject, html) = EmailTemplates.VerifyEmail(customer.Name, VerifyUrl(customer.EmailVerificationToken));
         await email.SendAsync(customer.Email, customer.Name, subject, html);
+    }
+
+    public async Task ForgotPasswordAsync(string emailAddress)
+    {
+        var customer = await db.Customers.FirstOrDefaultAsync(c => c.Email == emailAddress);
+        if (customer is null) return; // don't leak whether an account exists
+
+        customer.PasswordResetToken = NewToken();
+        customer.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddHours(1);
+        await db.SaveChangesAsync();
+
+        var (subject, html) = EmailTemplates.ResetPassword(customer.Name, ResetUrl(customer.PasswordResetToken));
+        await email.SendAsync(customer.Email, customer.Name, subject, html);
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordRequest req)
+    {
+        var customer = await db.Customers.FirstOrDefaultAsync(c => c.PasswordResetToken == req.Token);
+        if (customer is null || customer.PasswordResetTokenExpiresAt < DateTime.UtcNow)
+            throw new InvalidOrExpiredTokenException();
+
+        customer.PasswordHash = _hasher.HashPassword(customer, req.NewPassword);
+        customer.PasswordResetToken = null;
+        customer.PasswordResetTokenExpiresAt = null;
+        await db.SaveChangesAsync();
     }
 
     public async Task<CustomerMeDto?> GetMeAsync(int customerId)

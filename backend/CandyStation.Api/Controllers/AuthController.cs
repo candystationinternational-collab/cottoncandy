@@ -65,4 +65,25 @@ public class AuthController(AuthService auth) : ControllerBase
             return Ok(new { message = "If an account exists with that email, a new verification link has been sent." });
         }
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest req)
+    {
+        await auth.ForgotPasswordAsync(req.Email);
+        return Ok(new { message = "If an account exists with that email, a password reset link has been sent." });
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequest req)
+    {
+        try
+        {
+            await auth.ResetPasswordAsync(req);
+            return Ok(new { message = "Password reset successfully. You can now log in." });
+        }
+        catch (InvalidOrExpiredTokenException)
+        {
+            return BadRequest(new { message = "This reset link is invalid or has expired." });
+        }
+    }
 }

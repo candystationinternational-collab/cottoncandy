@@ -37,6 +37,20 @@ public static class EmailTemplates
             """)
     );
 
+    public static (string Subject, string Html) ResetPassword(string name, string resetUrl) => (
+        "Reset your Candy Station password",
+        Wrap("Reset Your Password",
+            $"""
+            <p style="color:#333;font-size:14px;line-height:1.6;">Hi {name},</p>
+            <p style="color:#333;font-size:14px;line-height:1.6;">We received a request to reset your password. Click below to choose a new one:</p>
+            <p style="text-align:center;margin:24px 0;">
+              <a href="{resetUrl}" style="background:{Pink};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:999px;font-weight:700;font-size:14px;display:inline-block;">Reset My Password</a>
+            </p>
+            <p style="color:#666;font-size:12px;">If the button doesn't work, copy this link into your browser: <br/>{resetUrl}</p>
+            <p style="color:#666;font-size:12px;">This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>
+            """)
+    );
+
     public static (string Subject, string Html) OrderCreated(string name, string orderNumber, decimal total) => (
         $"Order Confirmed — {orderNumber}",
         Wrap("Order Confirmed! 🎉",

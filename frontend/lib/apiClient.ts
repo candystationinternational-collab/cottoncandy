@@ -205,6 +205,10 @@ export const apiClient = {
   verifyEmail: (token: string) => request<AuthResponse>(`/api/auth/verify-email?token=${encodeURIComponent(token)}`),
   resendVerification: (email: string) =>
     request<{ message: string }>("/api/auth/resend-verification", { method: "POST", body: { email } }),
+  forgotPassword: (email: string) =>
+    request<{ message: string }>("/api/auth/forgot-password", { method: "POST", body: { email } }),
+  resetPassword: (token: string, newPassword: string) =>
+    request<{ message: string }>("/api/auth/reset-password", { method: "POST", body: { token, newPassword } }),
   getMe: () => request<CustomerMe>("/api/customers/me", { auth: "customer" }),
 
   adminLogin: (username: string, password: string) =>

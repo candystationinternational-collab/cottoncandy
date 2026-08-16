@@ -86,10 +86,14 @@ export default function HomePage() {
       <section ref={heroRef} className="relative overflow-hidden border-b-4 border-navy bg-cream">
         <div className="container-cs grid items-center gap-10 py-16 md:grid-cols-2 md:py-24">
           <div>
-            <h1 className="font-display text-4xl font-extrabold leading-[1.05] text-navy sm:text-5xl lg:text-6xl">
-              {HEADLINE.split("").map((ch, i) => (
-                <span key={i} className="letter-reveal inline-block">
-                  {ch === " " ? " " : ch}
+            <h1 className="flex flex-wrap font-display text-3xl font-extrabold leading-[1.15] text-navy sm:text-5xl sm:leading-[1.05] lg:text-6xl">
+              {HEADLINE.split(" ").map((word, wi) => (
+                <span key={wi} className="mr-[0.28em] inline-flex last:mr-0">
+                  {word.split("").map((ch, i) => (
+                    <span key={i} className="letter-reveal inline-block">
+                      {ch}
+                    </span>
+                  ))}
                 </span>
               ))}
             </h1>

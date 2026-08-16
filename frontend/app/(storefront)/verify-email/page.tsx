@@ -17,6 +17,7 @@ function VerifyEmailContent() {
 
   useEffect(() => {
     if (!token) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reacting to a missing query param, not derivable during render
       setStatus("error");
       setError("Missing verification token.");
       return;
