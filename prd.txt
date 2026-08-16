@@ -1,0 +1,363 @@
+Candy Station
+E-Commerce Website — Product Requirements Document (PRD)
+Version 1.0  ·  2026-08-13  ·  Audience: Software Engineering AI Agents  ·  Market: Pakistan (PKR)
+FieldValueProductCandy Station — Premium Cotton Candy Online StoreDocument version2.0Date2026-08-13AudienceSoftware engineering AI agents (build/continue the product)StatusApproved for buildMarketPakistan (Lahore HQ, nationwide delivery zones)CurrencyPKR (displayed as Rs. 1,000)Tech stackNext.js + GSAP (frontend) · ASP.NET Core (.NET Core) Web API (backend) · Microsoft SQL Server (database)Visual benchmarkhttps://fizzi-soda-for-gusty-people.vercel.app/ (GSAP product-showcase style)
+
+1. Executive Summary
+Candy Station is an e-commerce website for a premium cotton candy brand based in Lahore, Pakistan. Customers can browse a flavor catalog with cinematic, GSAP-animated product showcases, add products to a cart, check out via Cash on Delivery (COD) or store pickup, create accounts, and track order status in real time. Store staff manage products, categories, orders, customers, and settings through a password-protected admin panel.
+Architecture: a Next.js (App Router, TypeScript) frontend with GSAP (ScrollTrigger) animations consumes a .NET Core (ASP.NET Core) Web API backed by Microsoft SQL Server. The existing static HTML/CSS/JS prototype (in this repository) is the validated reference for all business logic, copy, and data; this PRD formalizes the production rebuild.
+This PRD gives a receiving AI agent everything needed to build the production system.
+
+2. Product Overview & Current State
+? Brand name: Candy Station — Premium Cotton Candy
+? Current prototype: fully static site (HTML + CSS + vanilla JS) with a localStorage data layer that simulates MS SQL Server. Business logic is proven there: repository-style APIs (Categories, Products, Orders, Customers, Settings, Auth, Cart) in js/data.js, 13 storefront pages + 7 admin pages. The prototype's business rules (§6/§7) and copy are the source of truth — the new build re-implements them, it does not redesign them.
+? Target production architecture (this PRD):
+LayerTechnologyHostingFrontendNext.js (App Router), React 18+, TypeScript, Tailwind or CSS Modules, GSAP + ScrollTrigger (Lenis smooth scroll optional)VercelBackendASP.NET Core Web API (.NET 8 LTS), EF Core ORM, JWT auth, SwaggerAzure App Service / SmarterASP.NETDatabaseMicrosoft SQL Server 2022 (Azure SQL or hosted MS SQL)Same as backendAnimationsGSAP 3 (ScrollTrigger, SplitText-style reveals, custom product carousel)—
+? Design benchmark: https://fizzi-soda-for-gusty-people.vercel.app/ — bold hero typography, letter-by-letter headline reveals, scroll-triggered section animations, and a flavor/product showcase carousel with smooth animated transitions. Candy Station adapts this motion language to fluffy cotton candy visuals (inline SVG / generated product art).
+
+3. Goals & Success Metrics
+3.1 Product goals
+1. Let customers discover, buy, and track cotton candy products in under 3 minutes.
+2. Make the catalog feel premium: GSAP-animated product hero, scroll reveals, and a flavor carousel like the Fizzi benchmark.
+3. Let store staff manage the entire catalog and order pipeline without touching code (admin panel served by the same Next.js app or a separate route group).
+4. Production-grade data: MS SQL Server persistence, REST API, secure auth — replacing the localStorage simulation 1:1.
+3.2 Success metrics (targets)
+? Checkout completion rate ? 40% of cart sessions (analytics once live)
+? Median order placement time ? 3 minutes
+? Admin order-status update latency: < 500 ms (API round-trip)
+? First Contentful Paint ? 1.5 s on 4G; Lighthouse performance ? 90 (desktop), ? 75 (mobile)
+? Animations: 60 fps during all GSAP scroll triggers (no jank on mid-range devices); fully functional with prefers-reduced-motion: reduce
+? 100% of pages render correctly at 360 px, 768 px, and 1280 px widths
+
+4. Non-Goals (Out of Scope for v1)
+? Online card/wallet payment processing (COD only in v1; "online payments coming soon" messaging present)
+? Real-time SMS/email notifications (in-app timeline only)
+? Multi-language (English only; lang="en")
+? Mobile apps
+? Customer-authored reviews (rating/review counts are catalog data)
+? 3D/WebGL product models (GSAP 2D motion only; no Three.js dependency)
+? Server-side rendering of admin dashboard charts (client-side charts from API data)
+? Gradients — brand uses solid colors only (see §10)
+
+5. Users & Personas
+PersonaDescriptionKey needsGuest shopperCasual buyer, does not want to registerBrowse animated catalog, cart, guest checkout, track order with order # + emailRegistered customerReturning buyerAccount dashboard, order history, saved addresses, faster checkoutStore adminCandy Station staffFull CRUD on catalog, order workflow, customer lookup, store settingsDelivery coordinatorStaff updating order statusOne-click status transitions (Pending ? Confirmed ? Preparing ? Out for Delivery ? Delivered / Cancelled)
+
+6. Functional Requirements
+FR-1 — Storefront (Next.js frontend)
+FR-1.1 Global layout
+? Sticky navbar on all storefront pages: logo (56 px), links — Home, Shop, Flavors, About, FAQ, Track Order; cart icon with live count badge; login/account button reflecting auth state; hamburger menu on mobile.
+? Footer on all pages: logo (white-filtered for dark footer), store info, newsletter signup, COD payment badge, quick links, contact details.
+? Toast notifications for user feedback ("Added to cart").
+FR-1.2 Home
+? GSAP hero: logo/headline letter-by-letter reveal on load; floating cotton candy visual with parallax on scroll (benchmark: Fizzi hero).
+? Category cards (Classic, Fruity, Fresh & Cool, Indulgent) linking to /shop?cat=<id>, revealed with staggered ScrollTrigger fade-up.
+? Featured products grid (first 6 active products from API).
+? COD promo banner, features section, about preview.
+FR-1.3 Shop (/shop)
+? Sidebar filters: category checkboxes, price range slider, flavor tag chips.
+? Search box (name, description, flavorTags — case-insensitive).
+? Sort dropdown (price ?/?, rating, name).
+? Responsive product grid; ?cat= query param pre-selects category. Grid items animate in with scroll-triggered stagger.
+FR-1.4 Product detail (/product/[id]) — animated showcase
+? GSAP product showcase: large product visual that reacts to scroll (parallax float, subtle rotation/scale) — the "star of the page" like the Fizzi flavor carousel.
+? Flavor carousel: previous/next navigation between flavors of the same category with GSAP slide/fade transitions (benchmark: Fizzi "Choose Your Flavor" carousel).
+? Variant selector (Single Pack 50 g / Family Pack 150 g) — price updates on selection.
+? Quantity stepper, Add to Cart with toast.
+? Tabs: Description, Ingredients, Nutrition (table), Reviews.
+? Related products (same category, exclude current).
+? Product art: SVG/canvas cotton candy generated from candyColor (fluffy cloud of ellipses + gold stick), animated with GSAP.
+FR-1.5 Cart (/cart)
+? Line items from API-validated cart (client cart store synced with product data): product, variant, unit price, quantity stepper, line total, remove.
+? Order summary: subtotal, shipping (calculated at checkout), total.
+? "Proceed to Checkout" ? /checkout.
+FR-1.6 Checkout (/checkout) — 6-step wizard
+5. Auth choice: Guest checkout, Login, or Signup.
+6. Shipping details: name, phone, address line 1/2, city, state, postal code, country (Pakistan default).
+7. Delivery method: Home delivery (zone-based fee) or free store pickup.
+8. Payment: COD only; show COD instructions and min/max limits.
+9. Review: items, addresses, fees, total.
+10. Confirmation: order number displayed; cart cleared.
+? On submit: POST /api/orders; field validation blocks advancing; steps are editable backwards.
+FR-1.7 Track Order (/track-order)
+? Order number + email ? order timeline with 5 status steps, items, totals, delivery address.
+FR-1.8 Static content pages
+? /faq: accordion of 12 FAQs (Orders, Shipping & Delivery, Payments, Returns & Refunds, Product Info) + delivery-zone table + store hours + COD instructions.
+? /about: brand story, mission, "why choose us", values, CTA, contact info.
+? (Remove or archive the old hosting.html marketing page in the rebuild; it was part of the prototype only.)
+FR-2 — Accounts & Authentication (JWT)
+FR-2.1 Signup (/signup) — name, email, phone, password. Email unique ? else 409 error. On success: auto-login (JWT), redirect to /account.
+FR-2.2 Login (/login) — email + password ? POST /api/auth/login ? JWT (httpOnly cookie or Authorization header) ? redirect to /account. Demo hint: aarav@example.com / demo123 (seed data).
+FR-2.3 Account (/account) — tabs: Profile, Orders (GET /api/orders?email= or by token), Addresses (saved shipping addresses), Logout.
+FR-2.4 Session model
+? Customer: JWT containing customer id/email; refresh-token rotation (or long-lived JWT for v1 — documented decision).
+? Admin: separate admin JWT role claim (role: admin).
+? Passwords: never plain text — PBKDF2/BCrypt hashes (seed demo users hashed at seed time).
+? Cart: client-side store (localStorage/context) in v1; server-side cart sync is a documented future step.
+FR-3 — Admin Panel (Next.js route group /admin/* + .NET API)
+All admin routes are client-side protected (redirect to /admin/login when no admin JWT; server-side middleware also checks the cookie).
+FR-3.1 Admin login — username/password against AdminUsers table (default seed admin / admin123, must be changed in production).
+FR-3.2 Dashboard — 5 stat cards (Revenue, Orders, Pending, Products, Low Stock), revenue trend line chart, orders-by-day bar chart, recent orders table (last 10), top-selling products, low-stock alerts. Data from GET /api/admin/stats.
+FR-3.3 Products — table with image, search, category + status filters, bulk actions; add/edit modal (name, description, category, price, compare-at, cost, stock, SKU, variants builder, flavor tags, candy color picker with live preview, weight, status); delete with confirmation. CRUD via /api/admin/products.
+FR-3.4 Categories — card grid, add/edit modal, delete with product-assignment warning, drag-to-reorder (PATCH displayOrder).
+FR-3.5 Orders — 8-column table, search, status + date-range filters, CSV export; detail modal (customer info, shipping address, delivery zone, items, totals, status timeline, "Update Status" dropdown, internal notes). PUT /api/admin/orders/{id}/status.
+FR-3.6 Customers — table with avatars, search, sort (newest/spent/orders), profile view (contact info, total spent, addresses, order history).
+FR-3.7 Settings — Store info, delivery zones (inline add/remove/edit), pickup settings, COD settings (toggle + min/max + instructions), tax rate, shipping policy text, admin password change (verifies current password), Danger Zone (reset all data via a seed-reset endpoint, dev-only).
+FR-4 — Animation Requirements (GSAP — benchmark: Fizzi)
+IDAnimationSpecAN-1Hero revealHeadline/logo letters animate in on load (staggered, ease power3.out); cotton candy visual floats with mouse/scroll parallaxAN-2Scroll revealsSections/content stagger in with ScrollTrigger (scrub optional), fade + y-transform 40 px, once per viewAN-3Product showcaseProduct detail hero: scroll-driven float, slight rotate/scale; color-matched glow behind product artAN-4Flavor carouselPrevious/next flavor transitions with GSAP slide + crossfade (400–600 ms, expo.out); progress indicatorAN-5Shop gridCards enter with staggered ScrollTrigger; hover: card lifts, product art wobbles (CSS transition + GSAP quickTo)AN-6Marquee/badgesCOD banner and flavor tags may use GSAP infinite marquee (optional, subtle)AN-7Reduced motionMandatory: all animation tweened only when matchMedia('(prefers-reduced-motion: reduce)') is false; otherwise elements appear in final state instantlyAN-8PerformanceGPU-friendly transforms (transform, opacity only); no layout thrash; pause ScrollTrigger on hidden tabs (gsap.ticker respects document.hidden); LCP element never animated into view after load
+FR-5 — Business Rules (single source of truth — unchanged from validated prototype)
+RuleSpecificationCurrencyPKR; API returns numeric amounts, frontend formats Rs. 1,000Product variants2 per product by default: Single Pack (50 g) — Rs. 200; Family Pack (150 g) — Rs. 500 (data-driven, editable)Delivery zonesZone A ?5 km — Rs. 100 · Zone B 5–15 km — Rs. 200 · Zone C 15–30 km — Rs. 300 · Zone D 30 km+ — Rs. 400 · Store pickup — freePaymentCOD only; max COD order Rs. 10,000; no minimum; tax rate 0% (configurable via Settings)Order statusespending ? confirmed ? preparing ? out_for_delivery ? delivered; cancelled from any active stateOrder numberingORD-YYYY-NNNN (e.g., ORD-2026-0001), auto-increment — generated by the API (sequence/identity)Order timelineEvery status change inserts a row into OrderTimelineLow stockThreshold ? 20 units ? flagged on dashboardRevenue statSUM(total) of orders with status deliveredEdit windowOrders modifiable/cancellable within 1 hour of placement (policy text; enforcement optional v1)ReturnsNo returns on opened cotton candy; damaged/incorrect replaced within 24 h; refunds 3–5 business days (policy text)
+
+7. Data Model — Microsoft SQL Server
+The prototype's JSON schema maps 1:1 to the tables below. The API (EF Core) owns all persistence; the frontend never touches SQL.
+7.1 Entity-Relationship overview
+Categories 1—? Products 1—? ProductVariants · Customers 1—? Orders 1—? OrderItems · Orders 1—? OrderTimeline · Orders ?—1 DeliveryZones · AdminUsers · Settings (single-row).
+7.2 T-SQL DDL (target schema)
+CREATE TABLE Categories (
+  Id            INT IDENTITY(1,1) PRIMARY KEY,
+  Name          NVARCHAR(100)  NOT NULL,
+  Description   NVARCHAR(500)  NULL,
+  DisplayOrder  INT            NOT NULL DEFAULT 0,
+  Status        NVARCHAR(20)   NOT NULL DEFAULT 'active' CHECK (Status IN ('active','inactive')),
+  CreatedAt     DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME(),
+  UpdatedAt     DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME()
+);
+ 
+CREATE TABLE Products (
+  Id             INT IDENTITY(1,1) PRIMARY KEY,
+  CategoryId     INT            NOT NULL REFERENCES Categories(Id),
+  Name           NVARCHAR(150)  NOT NULL,
+  Description    NVARCHAR(2000) NULL,
+  Ingredients    NVARCHAR(1000) NULL,
+  ServingSize    NVARCHAR(50)   NULL,
+  Calories       INT            NULL,
+  Fat            NVARCHAR(50)   NULL,
+  Carbs          NVARCHAR(50)   NULL,
+  Protein        NVARCHAR(50)   NULL,
+  Price          DECIMAL(10,2)  NOT NULL,           -- base price (first variant)
+  CompareAtPrice DECIMAL(10,2)  NULL,
+  CostPrice      DECIMAL(10,2)  NULL,               -- internal, admin only
+  Stock          INT            NOT NULL DEFAULT 0,
+  Sku            NVARCHAR(50)   NOT NULL UNIQUE,
+  Status         NVARCHAR(20)   NOT NULL DEFAULT 'active' CHECK (Status IN ('active','inactive')),
+  Weight         NVARCHAR(20)   NULL,
+  FlavorTags     NVARCHAR(500)  NULL,               -- comma-separated
+  CandyColor     NVARCHAR(9)    NOT NULL DEFAULT '#F90264',
+  Rating         DECIMAL(2,1)   NOT NULL DEFAULT 0,
+  ReviewCount    INT            NOT NULL DEFAULT 0,
+  CreatedAt      DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME(),
+  UpdatedAt      DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME()
+);
+ 
+CREATE TABLE ProductVariants (
+  Id        INT IDENTITY(1,1) PRIMARY KEY,
+  ProductId INT            NOT NULL REFERENCES Products(Id) ON DELETE CASCADE,
+  Name      NVARCHAR(100)  NOT NULL,
+  Price     DECIMAL(10,2)  NOT NULL,
+  SortOrder INT            NOT NULL DEFAULT 0
+);
+ 
+CREATE TABLE Customers (
+  Id          INT IDENTITY(1,1) PRIMARY KEY,
+  Name        NVARCHAR(150) NOT NULL,
+  Email       NVARCHAR(150) NOT NULL UNIQUE,
+  Phone       NVARCHAR(30)  NULL,
+  PasswordHash NVARCHAR(256) NOT NULL,               -- PBKDF2/BCrypt, never plain text
+  JoinedDate  DATETIME2     NOT NULL DEFAULT SYSUTCDATETIME(),
+  OrdersCount INT           NOT NULL DEFAULT 0,
+  TotalSpent  DECIMAL(10,2) NOT NULL DEFAULT 0
+);
+ 
+CREATE TABLE CustomerAddresses (
+  Id          INT IDENTITY(1,1) PRIMARY KEY,
+  CustomerId  INT           NOT NULL REFERENCES Customers(Id) ON DELETE CASCADE,
+  Label       NVARCHAR(50)  NULL,
+  Name        NVARCHAR(150) NOT NULL,
+  Phone       NVARCHAR(30)  NOT NULL,
+  Address1    NVARCHAR(200) NOT NULL,
+  Address2    NVARCHAR(200) NULL,
+  City        NVARCHAR(100) NOT NULL,
+  State       NVARCHAR(100) NOT NULL,
+  PostalCode  NVARCHAR(20)  NOT NULL,
+  Country     NVARCHAR(100) NOT NULL DEFAULT 'Pakistan'
+);
+ 
+CREATE TABLE DeliveryZones (
+  Id          INT IDENTITY(1,1) PRIMARY KEY,
+  Name        NVARCHAR(50)   NOT NULL,
+  Description NVARCHAR(200)  NULL,
+  Cost        DECIMAL(10,2)  NOT NULL,
+  Enabled     BIT            NOT NULL DEFAULT 1
+);
+ 
+CREATE TABLE Orders (
+  Id            INT IDENTITY(1,1) PRIMARY KEY,
+  OrderNumber   NVARCHAR(20)   NOT NULL UNIQUE,     -- 'ORD-2026-0001'
+  CustomerId    INT            NULL REFERENCES Customers(Id),  -- NULL = guest
+  CustomerName  NVARCHAR(150)  NOT NULL,
+  CustomerEmail NVARCHAR(150)  NOT NULL,
+  CustomerPhone NVARCHAR(30)   NOT NULL,
+  Subtotal      DECIMAL(10,2)  NOT NULL,
+  Shipping      DECIMAL(10,2)  NOT NULL DEFAULT 0,
+  Total         DECIMAL(10,2)  NOT NULL,
+  PaymentMethod NVARCHAR(20)   NOT NULL DEFAULT 'COD',
+  DeliveryMethod NVARCHAR(20)  NOT NULL CHECK (DeliveryMethod IN ('delivery','pickup')),
+  DeliveryZoneId INT           NULL REFERENCES DeliveryZones(Id),
+  ShippingAddressId INT        NULL REFERENCES CustomerAddresses(Id),
+  Status        NVARCHAR(20)   NOT NULL DEFAULT 'pending'
+                CHECK (Status IN ('pending','confirmed','preparing','out_for_delivery','delivered','cancelled')),
+  Notes         NVARCHAR(1000) NULL,
+  PlacedAt      DATETIME2      NOT NULL DEFAULT SYSUTCDATETIME()
+);
+ 
+CREATE TABLE OrderItems (
+  Id        INT IDENTITY(1,1) PRIMARY KEY,
+  OrderId   INT            NOT NULL REFERENCES Orders(Id) ON DELETE CASCADE,
+  ProductId INT            NOT NULL REFERENCES Products(Id),
+  ProductName NVARCHAR(150) NOT NULL,               -- snapshot
+  VariantName  NVARCHAR(100) NOT NULL,              -- snapshot
+  UnitPrice DECIMAL(10,2)  NOT NULL,
+  Quantity  INT            NOT NULL,
+  LineTotal DECIMAL(10,2)  NOT NULL
+);
+ 
+CREATE TABLE OrderTimeline (
+  Id      INT IDENTITY(1,1) PRIMARY KEY,
+  OrderId INT           NOT NULL REFERENCES Orders(Id) ON DELETE CASCADE,
+  Status  NVARCHAR(20)  NOT NULL,
+  ChangedAt DATETIME2   NOT NULL DEFAULT SYSUTCDATETIME()
+);
+ 
+CREATE TABLE AdminUsers (
+  Id           INT IDENTITY(1,1) PRIMARY KEY,
+  Username     NVARCHAR(50)  NOT NULL UNIQUE,
+  PasswordHash NVARCHAR(256) NOT NULL,
+  DisplayName  NVARCHAR(100) NULL,
+  IsActive     BIT           NOT NULL DEFAULT 1
+);
+ 
+CREATE TABLE Settings (
+  Id              INT IDENTITY(1,1) PRIMARY KEY,
+  StoreName       NVARCHAR(150) NOT NULL DEFAULT 'Candy Station',
+  StoreAddress    NVARCHAR(300) NULL,
+  StorePhone      NVARCHAR(30)  NULL,
+  StoreEmail      NVARCHAR(150) NULL,
+  StoreHours      NVARCHAR(100) NULL,
+  Currency        NVARCHAR(10)  NOT NULL DEFAULT 'PKR',
+  PickupAddress   NVARCHAR(300) NULL,
+  PickupHours     NVARCHAR(100) NULL,
+  CodEnabled      BIT           NOT NULL DEFAULT 1,
+  CodMinOrder     DECIMAL(10,2) NOT NULL DEFAULT 0,
+  CodMaxOrder     DECIMAL(10,2) NOT NULL DEFAULT 10000,
+  CodInstructions NVARCHAR(500) NULL,
+  TaxRate         DECIMAL(5,2)  NOT NULL DEFAULT 0,
+  ShippingPolicy  NVARCHAR(2000) NULL
+);
+
+7.3 Seed data (identical to validated prototype)
+? 4 categories: Classic, Fruity, Fresh & Cool, Indulgent.
+? 6 products: Strawberry Dream (#F90264), Blueberry Bliss (#7E02E8), Orange Burst (#FD7603), Mint Fresh (#9DC403), Coffee Delight (#6B4226), Vanilla Bliss (#FFF8EE) — each with 2 variants (Single 50 g Rs. 200 / Family 150 g Rs. 500), ingredients, nutrition, SKU (CS-XXX-NNN), flavor tags, rating/reviews, stock 60–100.
+? 4 delivery zones A–D (Rs. 100/200/300/400).
+? 5 customers (demo password demo123, stored hashed) + 5 orders covering all statuses, incl. a guest order.
+? 1 admin user (admin / admin123, hashed).
+? Settings row matching prototype settings (COD max 10,000, tax 0, store hours 11am–11pm).
+
+8. Technical Architecture
+8.1 Frontend — Next.js + GSAP
+? Next.js 14+ (App Router), TypeScript. Server Components for content pages; client components isolated to interactive islands (carousel, cart, checkout, admin).
+? GSAP 3 with ScrollTrigger (and useGSAP hook for React 18 StrictMode safety). Optional: Lenis for buttery smooth scroll (respect prefers-reduced-motion).
+? Data fetching: Server Components call the .NET API (SSR/ISR for catalog pages, e.g. revalidate = 300); client mutations (cart/checkout/auth) call the API via a typed fetch client.
+? State: cart in a lightweight context + localStorage persistence; auth token in httpOnly cookie (server middleware validates).
+? Styling: CSS Modules or Tailwind with the design tokens from §10. No gradients.
+? Product art: SVG cotton candy rendered from CandyColor (ported from the prototype's generateScoopSVG), animated by GSAP.
+8.2 Backend — ASP.NET Core Web API
+? .NET 8 LTS, minimal APIs or controllers; EF Core 8 with SQL Server provider; migrations checked into /backend/Migrations.
+? Auth: JWT bearer (customer + admin role claims); PasswordHasher (PBKDF2, 100k+ iterations); admin endpoints require [Authorize(Roles = "Admin")].
+? Contracts: DTOs for all entities (never expose EF entities directly); FluentValidation for inputs; global exception middleware returning RFC 7807 problem details; CORS allowlist for the Vercel origin; Swagger/OpenAPI enabled (dev).
+? Services: ProductService, OrderService (order number generation ORD-{year}-{seq:0000}, totals, timeline, stock decrement), AuthService, StatsService.
+8.3 REST API contract
+Method & pathPurposeAuthGET /api/products?categoryId=&search=&minPrice=&maxPrice=&tag=&sort=&page=&pageSize=Catalog list w/ filters, sort, paginationPublicGET /api/products/{id}Product detail (variants, nutrition, related)PublicGET /api/categoriesCategories (active, ordered)PublicPOST /api/auth/registerCustomer signupPublicPOST /api/auth/loginCustomer login ? JWTPublicGET /api/customers/meCurrent customer profile + addressesCustomerPOST /api/ordersPlace order (guest or customer); returns OrderNumberPublic (guest ok)GET /api/orders/track?number=&email=Order tracking timelinePublicGET /api/orders/mineCurrent customer's ordersCustomerPOST /api/admin/auth/loginAdmin login ? admin JWTPublicGET /api/admin/statsDashboard stats + chart seriesAdminGET/POST/PUT/DELETE /api/admin/products (+ /{id})Product CRUD, bulk statusAdminGET/POST/PUT/DELETE /api/admin/categoriesCategory CRUD, reorder (PATCH displayOrder)AdminGET /api/admin/orders?status=&from=&to=&search=Order list + filters + CSV-ready rowsAdminPUT /api/admin/orders/{id}/statusStatus transition (appends timeline)AdminGET/PUT /api/admin/customers · GET/PUT /api/admin/settingsCustomers + settingsAdminPOST /api/admin/passwordChange admin password (verifies current)Admin
+8.4 Repository layout
+candy-station/
+??? frontend/                     # Next.js app
+?   ??? app/
+?   ?   ??? (storefront)/         # layout, page, shop, product/[id], cart,
+?   ?   ?                         # checkout, login, signup, account, track-order, faq, about
+?   ?   ??? admin/                # admin login, dashboard, products, categories,
+?   ?                             # orders, customers, settings
+?   ??? components/               # Navbar, Footer, ProductCard, FlavorCarousel,
+?   ?                             # ProductShowcase, CartDrawer, Toast, admin tables/modals
+?   ??? lib/                      # api client, auth, cart store, format.ts, candyArt.tsx
+?   ??? hooks/                    # useGsap (useGSAP wrappers), useCart, useAuth
+?   ??? public/                   # logo.png, favicon
+??? backend/                      # ASP.NET Core solution
+?   ??? CandyStation.Api/         # Controllers/Endpoints, DTOs, Validation, Auth
+?   ??? CandyStation.Core/        # Entities, Interfaces
+?   ??? CandyStation.Infrastructure/  # EF Core DbContext, Migrations, Repositories
+?   ??? CandyStation.Tests/       # unit + integration tests
+??? database/
+?   ??? schema.sql                # DDL from §7.2
+?   ??? seed.sql                  # seed data from §7.3
+??? README.md                     # run instructions (both apps)
+
+8.5 Migration path from the prototype
+11. Port js/data.js schema ? MS SQL DDL (§7) and seed.
+12. Build .NET API around the repository methods (behavior parity with prototype).
+13. Scaffold Next.js app; port pages 1:1 (same copy, routes, business rules).
+14. Swap data reads to API; keep the same user flows.
+15. Layer GSAP animations (AN-1…AN-8) following the Fizzi benchmark.
+16. Delete the static prototype from the production repo (keep in git history).
+
+9. Non-Functional Requirements
+CategoryRequirementPerformanceLCP ? 1.5 s mobile 4G; GSAP only animates transform/opacity; ScrollTrigger scrubbed animations use will-change sparingly; Next.js Image for logo/art assets; API responses < 300 ms p95Animation quality60 fps on mid-range Android; animations pause when tab hidden; all motion disabled under prefers-reduced-motion: reduce (final states shown instantly)ResponsiveMobile-first; breakpoints ~968 / 768 / 480 px; no overlap/overflow; buttons never clippedAccessibilitySemantic HTML, lang="en", focus states, keyboard-reachable nav, aria-labels on icon buttons and carousel controls, carousel supports keyboard prev/nextSecurityJWT auth with role claims; passwords PBKDF2/BCrypt; admin endpoints role-protected server-side; input validation (FluentValidation); SQL via EF Core parameters (no string interpolation); CORS allowlist; no secrets in client code; dotnet user-secrets/env for connection stringsData integrityForeign keys + CHECK constraints (§7.2); order items snapshot product name/price; stock decremented in a transaction with order creation; unique OrderNumberSEOPer-page metadata, sitemap, lang="en"; product pages SSG/ISR for crawlabilityObservabilityStructured logs + request logging in API; /health endpoint; frontend error boundaryTestsBackend: unit tests (services) + integration tests (API + test DB). Frontend: at minimum build + lint + key flow smoke tests (Playwright optional)Browser supportLast 2 versions of Chrome, Edge, Firefox, Safari
+
+10. Design System (mandatory — unchanged from validated prototype)
+TokenValueUsage--navy#2D0A31footer, admin sidebar, dark surfaces--cream#FFF4F8accents, alt sections--bg#FFF8FBpage background--pink#F90264primary brand accent--lime / --purple / --cyan / --orangebrand palettecategory/feature accents--gold#E8B547stars, cotton candy stick
+? Typography: Poppins (600–800 headings), Inter (400–600 body) — Google Fonts.
+? Rule: zero gradients — solid fills only.
+? Buttons: primary (navy/pink fill), outline, gold accent; btn-lg hero CTAs.
+? Product art: SVG cotton candy = fluffy cloud of ellipses in CandyColor on #FFF8FB with white highlights + gold stick (ported from prototype generateScoopSVG).
+? Badges: status badges pending/confirmed/preparing/shipping/delivered/cancelled with distinct colors.
+? Motion language (Fizzi-inspired): load hero letter-reveal ? scroll-triggered section reveals ? flavor carousel with slide/crossfade ? hover micro-interactions. Keep motion purposeful; never animate the LCP hero image into view after load.
+
+11. Acceptance Criteria (receiving agent must verify)
+Storefront & animations
+? AC-1 All storefront routes render with no console errors in Chrome/Firefox.
+? AC-2 Hero animates on load (letter reveal + floating art) and is fully visible with JS disabled fallback (no empty hero).
+? AC-3 Scroll-triggered reveals fire once, at 60 fps, and do not run when prefers-reduced-motion: reduce (elements appear in final state).
+? AC-4 Product detail flavor carousel: prev/next transitions animate and keyboard-accessible; URL reflects selected product (/product/[id]).
+? AC-5 Shop filters/search/sort/?cat= work together; grid items stagger in.
+? AC-6 Cart badge live-updates; adding product shows toast; cart totals = ? line totals.
+? AC-7 Checkout validates each step; placing order calls POST /api/orders, shows ORD-2026-NNNN confirmation, clears cart.
+? AC-8 Track Order with real order # + email renders correct 5-step timeline.
+? AC-9 Signup duplicate email ? 409 error; success auto-logs-in (JWT).
+? AC-10 Login aarav@example.com / demo123 works; logout clears session.
+? AC-11 All pages render correctly at 360/768/1280 px.
+Admin
+? AC-12 Unauthenticated /admin/* redirects to /admin/login (client + server middleware).
+? AC-13 Admin login admin / admin123 reaches dashboard with correct stats.
+? AC-14 Product/category/order/customer/settings CRUD persists in MS SQL (verify after reload and after API restart).
+? AC-15 Order status update appends timeline row; CSV export valid.
+? AC-16 Admin password change verifies current password.
+Backend & data
+? AC-17 API project builds (dotnet build), migrations apply cleanly to a fresh DB, seed runs once (idempotent).
+? AC-18 All public endpoints return correct DTOs; invalid input ? 400 with validation details; unauthenticated admin calls ? 401/403.
+? AC-19 Order creation is transactional: order + items + timeline + stock decrement all commit or roll back together; OrderNumber unique.
+? AC-20 Passwords stored hashed (verify DB, not plain text); /api/customers/me returns only the caller's data.
+? AC-21 Swagger lists all endpoints (dev); /health returns 200.
+? AC-22 Unit tests for OrderService (numbering, totals, status transitions, low-stock) pass.
+
+12. Suggested Build Sequence (for the receiving agent)
+17. Database: database/schema.sql + seed.sql; verify against a local SQL Server (or SQL Server LocalDB / Docker mcr.microsoft.com/mssql/server).
+18. Backend: scaffold .NET 8 solution ? EF Core entities + migrations ? repositories ? services ? JWT auth ? controllers ? Swagger ? tests. Verify with Swagger against seed data.
+19. Frontend scaffold: Next.js + TypeScript + design tokens + layout shell (navbar/footer) + API client.
+20. Storefront pages: home ? shop ? product detail (static data via API) ? cart ? checkout ? confirmation.
+21. Accounts: register/login/account + JWT cookie handling + middleware.
+22. GSAP layer: install GSAP; implement AN-1…AN-8 (hero, scroll reveals, product showcase, flavor carousel, grid stagger, reduced-motion guard).
+23. Admin: login guard ? dashboard ? products ? categories ? orders ? customers ? settings (all against admin API).
+24. QA: run AC-1…AC-22; Lighthouse + 60 fps check; reduced-motion verification; responsive pass; fix and re-verify.
+25. Deploy (human step): API + DB to Azure App Service / SmarterASP.NET; frontend to Vercel; set env vars; production admin credentials.
+
+13. Open Questions / Assumptions
+#Assumption / questionImpact1Assumed market = Pakistan (PKR, Lahore store, +92 phones) per validated prototype seed data.Currency, zones2Assumed Vercel hosting for the Next.js frontend (matches the Fizzi benchmark) and Azure App Service / SmarterASP.NET for the .NET API + MS SQL.Deploy topology3Product art remains generated SVG cotton candy (animated with GSAP) until real photography is provided.Visuals4Online payment gateway (JazzCash/Easypaisa/cards) is future scope; COD messaging stays prominent.Checkout5Demo credentials (admin/admin123, demo123) are seed-only; production requires env-injected admin credentials and forced password change.Security6Cart is client-side in v1; server-side cart sync (persisted per customer) is a documented future enhancement.Data7The old hosting.html prototype page is dropped in the rebuild unless the business still wants it.Content
+
+End of PRD. The receiving agent must treat §6 FR-5 (Business Rules), §7 (MS SQL Schema), and §10 (Design System) as immutable contracts; §8 (architecture) and §12 (sequence) are binding implementation guidance.

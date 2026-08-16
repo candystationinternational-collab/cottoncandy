@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  /* Candy Station brand palette — extracted from the logo. Solid fills only, no gradients. */
+  --cs-navy: #2d0a31;
+  --cs-cream: #fff4f8;
+  --cs-bg: #fff8fb;
+  --cs-pink: #f90264;
+  --cs-purple: #7b2ff7;
+  --cs-orange: #fd7603;
+  --cs-lime: #8dc63f;
+  --cs-cyan: #00aeef;
+  --cs-blue: #2e3092;
+  --cs-gold: #e8b547;
+  --cs-ink: #1a0a1e;
+}
+
+@theme inline {
+  --color-navy: var(--cs-navy);
+  --color-cream: var(--cs-cream);
+  --color-bg: var(--cs-bg);
+  --color-pink: var(--cs-pink);
+  --color-purple: var(--cs-purple);
+  --color-orange: var(--cs-orange);
+  --color-lime: var(--cs-lime);
+  --color-cyan: var(--cs-cyan);
+  --color-blue: var(--cs-blue);
+  --color-gold: var(--cs-gold);
+  --color-ink: var(--cs-ink);
+  --font-display: var(--font-poppins);
+  --font-body: var(--font-inter);
+}
+
+body {
+  background: var(--cs-bg);
+  color: var(--cs-ink);
+  font-family: var(--font-inter), Arial, Helvetica, sans-serif;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: var(--cs-pink);
+  color: white;
+}
+
+.container-cs {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .container-cs {
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Reduced motion: freeze all GSAP-driven elements in their final state */
+.reduce-motion [data-gsap] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

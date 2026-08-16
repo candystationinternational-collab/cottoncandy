@@ -1,0 +1,6 @@
+@CandyStation.Api_HostAddress = http://localhost:5299
+
+GET {{CandyStation.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

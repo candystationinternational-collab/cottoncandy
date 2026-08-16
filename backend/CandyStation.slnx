@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CandyStation.Api/CandyStation.Api.csproj" />
+  <Project Path="CandyStation.Core/CandyStation.Core.csproj" />
+  <Project Path="CandyStation.Infrastructure/CandyStation.Infrastructure.csproj" />
+  <Project Path="CandyStation.Tests/CandyStation.Tests.csproj" />
+</Solution>

@@ -1,0 +1,34 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "Default": "Server=REPLACE_ME;Database=REPLACE_ME;User Id=REPLACE_ME;Password=REPLACE_ME;TrustServerCertificate=True;"
+  },
+  "Jwt": {
+    "Issuer": "CandyStation",
+    "Audience": "CandyStationClient",
+    "Key": "REPLACE_WITH_A_RANDOM_32+_CHARACTER_SIGNING_KEY",
+    "ExpiryMinutes": 10080
+  },
+  "Smtp": {
+    "Host": "smtp-relay.brevo.com",
+    "Port": 587,
+    "Username": "REPLACE_WITH_SMTP_USERNAME",
+    "Password": "REPLACE_WITH_SMTP_PASSWORD",
+    "SenderEmail": "hello@candystation.com.np",
+    "SenderName": "Candy Station"
+  },
+  "App": {
+    "FrontendBaseUrl": "https://REPLACE_WITH_YOUR_VERCEL_DOMAIN"
+  },
+  "Cors": {
+    "AllowedOrigins": ["https://REPLACE_WITH_YOUR_VERCEL_DOMAIN"]
+  },
+  "Swagger": {
+    "Enabled": true
+  }
+}
