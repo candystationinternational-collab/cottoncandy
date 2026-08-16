@@ -11,8 +11,16 @@ namespace CandyStation.Api.Services;
 public class OrderValidationException(string message) : Exception(message);
 public class OrderNotFoundException : Exception;
 
-public class OrderService(CandyStationDbContext db, IEmailService email)
+public class OrderService(CandyStationDbContext db, IEmailService email, IConfiguration config)
 {
+    private async Task NotifyAdminAsync(string subject, string html)
+    {
+        var adminEmail = config["Notifications:AdminEmail"];
+        if (string.IsNullOrWhiteSpace(adminEmail)) return;
+        await email.SendAsync(adminEmail, "Candy Station Admin", subject, html);
+    }
+
+
     public static OrderDto ToDto(Order o) => new(
         o.OrderNumber, o.CustomerName, o.CustomerEmail, o.CustomerPhone,
         o.Items.Select(i => new OrderItemDto(i.ProductName, i.VariantName, i.UnitPrice, i.Quantity, i.LineTotal)).ToList(),
@@ -173,6 +181,9 @@ public class OrderService(CandyStationDbContext db, IEmailService email)
         var (subject, html) = EmailTemplates.OrderCreated(order.CustomerName, order.OrderNumber, order.Total);
         await email.SendAsync(order.CustomerEmail, order.CustomerName, subject, html);
 
+        var (adminSubject, adminHtml) = EmailTemplates.AdminNewOrder(order.OrderNumber, order.CustomerName, order.CustomerEmail, order.Total);
+        await NotifyAdminAsync(adminSubject, adminHtml);
+
         return ToDto(order);
     }
 
@@ -214,8 +225,17 @@ public class OrderService(CandyStationDbContext db, IEmailService email)
 
         await db.SaveChangesAsync();
 
-        var (subject, html) = EmailTemplates.OrderStatusUpdate(order.CustomerName, order.OrderNumber, StatusToWire(newStatus).Replace('_', ' '));
-        await email.SendAsync(order.CustomerEmail, order.CustomerName, subject, html);
+        // Only the two milestones customers/admin actually care about get an email —
+        // not every intermediate status hop (confirmed/preparing/out_for_delivery).
+        if (newStatus == OrderStatus.Delivered)
+        {
+            var statusLabel = StatusToWire(newStatus).Replace('_', ' ');
+            var (subject, html) = EmailTemplates.OrderStatusUpdate(order.CustomerName, order.OrderNumber, statusLabel);
+            await email.SendAsync(order.CustomerEmail, order.CustomerName, subject, html);
+
+            var (adminSubject, adminHtml) = EmailTemplates.AdminOrderStatusUpdate(order.OrderNumber, order.CustomerName, statusLabel);
+            await NotifyAdminAsync(adminSubject, adminHtml);
+        }
 
         return ToDto(order);
     }

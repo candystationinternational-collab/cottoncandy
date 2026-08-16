@@ -27,7 +27,7 @@ export default function LoginPage() {
         setNeedsVerification(true);
         setError(err.message);
       } else {
-        setError(err instanceof ApiError ? err.message : "Invalid email or password. Try aarav@example.com / demo123.");
+        setError(err instanceof ApiError ? err.message : "Invalid email or password.");
       }
     }
   }
@@ -46,7 +46,6 @@ export default function LoginPage() {
     <div className="container-cs flex justify-center py-16">
       <div className="w-full max-w-sm">
         <h1 className="text-center font-display text-3xl font-extrabold text-navy">Welcome Back</h1>
-        <p className="mt-2 text-center text-sm text-navy/60">Demo: aarav@example.com / demo123</p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           {error && (

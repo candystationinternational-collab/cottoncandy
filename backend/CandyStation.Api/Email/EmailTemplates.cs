@@ -69,4 +69,28 @@ public static class EmailTemplates
             <p style="color:#333;font-size:14px;line-height:1.6;">Your order <strong>{orderNumber}</strong> status has been updated to <strong>{statusLabel}</strong>.</p>
             """)
     );
+
+    public static (string Subject, string Html) AdminNewOrder(string orderNumber, string customerName, string customerEmail, decimal total) => (
+        $"🔔 New Order — {orderNumber}",
+        Wrap("New Order Received",
+            $"""
+            <p style="color:#333;font-size:14px;line-height:1.6;">A new order just came in.</p>
+            <p style="color:#333;font-size:14px;line-height:1.6;">
+              <strong>Order:</strong> {orderNumber}<br/>
+              <strong>Customer:</strong> {customerName} ({customerEmail})<br/>
+              <strong>Total:</strong> Rs. {total:N0}
+            </p>
+            <p style="color:#333;font-size:14px;line-height:1.6;">Open the admin panel to view full details and manage the order.</p>
+            """)
+    );
+
+    public static (string Subject, string Html) AdminOrderStatusUpdate(string orderNumber, string customerName, string statusLabel) => (
+        $"Order {orderNumber} — {statusLabel}",
+        Wrap($"Order Status: {statusLabel}",
+            $"""
+            <p style="color:#333;font-size:14px;line-height:1.6;">
+              Order <strong>{orderNumber}</strong> ({customerName}) status changed to <strong>{statusLabel}</strong>.
+            </p>
+            """)
+    );
 }

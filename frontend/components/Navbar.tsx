@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/lib/cartStore";
+import { useAuth } from "@/lib/AuthProvider";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -19,6 +20,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
   const pathname = usePathname();
+  const { session } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 border-b-4 border-navy bg-bg/95 backdrop-blur">
@@ -57,10 +59,11 @@ export function Navbar() {
             )}
           </Link>
           <Link
-            href="/login"
-            className="hidden rounded-full border-2 border-navy px-4 py-2 text-sm font-bold text-navy transition-colors hover:border-pink hover:text-pink sm:block"
+            href={session ? "/account" : "/login"}
+            className="hidden items-center gap-1.5 rounded-full border-2 border-navy px-4 py-2 text-sm font-bold text-navy transition-colors hover:border-pink hover:text-pink sm:flex"
           >
-            Login
+            {session && <ProfileIcon />}
+            {session ? session.name.split(" ")[0] : "Login"}
           </Link>
           <button
             aria-label="Toggle menu"
@@ -89,14 +92,23 @@ export function Navbar() {
               </li>
             ))}
             <li>
-              <Link href="/login" onClick={() => setOpen(false)} className="text-base font-semibold text-pink">
-                Login
+              <Link href={session ? "/account" : "/login"} onClick={() => setOpen(false)} className="text-base font-semibold text-pink">
+                {session ? `My Account (${session.name.split(" ")[0]})` : "Login"}
               </Link>
             </li>
           </ul>
         </div>
       )}
     </header>
+  );
+}
+
+function ProfileIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
+      <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
   );
 }
 

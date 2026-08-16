@@ -25,6 +25,9 @@
   "App": {
     "FrontendBaseUrl": "https://REPLACE_WITH_YOUR_VERCEL_DOMAIN"
   },
+  "Notifications": {
+    "AdminEmail": "REPLACE_WITH_ADMIN_NOTIFICATION_EMAIL"
+  },
   "Cors": {
     "AllowedOrigins": ["https://REPLACE_WITH_YOUR_VERCEL_DOMAIN"]
   },

@@ -61,10 +61,6 @@ export default function AdminLoginPage() {
             {submitting ? "Signing in…" : "Sign In"}
           </button>
         </form>
-
-        <p className="mt-6 text-center text-xs text-navy/40">
-          Demo: admin / admin123 (Admin) · rider1 / rider123 (Delivery)
-        </p>
       </div>
     </div>
   );

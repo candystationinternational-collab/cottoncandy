@@ -145,16 +145,16 @@ public static class DbInitializer
         var hasher = new PasswordHasher<object>();
         db.AdminUsers.Add(new AdminUser
         {
-            Username = "admin",
-            PasswordHash = hasher.HashPassword(null!, "admin123"),
-            DisplayName = "Store Admin",
+            Username = "Rubalbasnet06@gmail.com",
+            PasswordHash = hasher.HashPassword(null!, "CandyStation#Rubal2026!"),
+            DisplayName = "Rubal Basnet",
             IsActive = true,
             Role = StaffRole.Admin,
         });
         db.AdminUsers.Add(new AdminUser
         {
             Username = "rider1",
-            PasswordHash = hasher.HashPassword(null!, "rider123"),
+            PasswordHash = hasher.HashPassword(null!, "CandyStation#Rider2026!"),
             DisplayName = "Bikash (Delivery)",
             IsActive = true,
             Role = StaffRole.Delivery,
@@ -165,7 +165,7 @@ public static class DbInitializer
             Name = "Aarav Shrestha",
             Email = "aarav@example.com",
             Phone = "+977 98XXXXXXXX",
-            PasswordHash = hasher.HashPassword(null!, "demo123"),
+            PasswordHash = hasher.HashPassword(null!, "CandyStation#Aarav2026!"),
             JoinedDate = DateTime.UtcNow.AddMonths(-3),
             IsEmailVerified = true, // seed/demo account skips the real verification flow
         };
