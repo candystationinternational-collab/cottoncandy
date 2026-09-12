@@ -114,6 +114,7 @@ if (app.Environment.IsDevelopment() || builder.Configuration.GetValue("Swagger:E
 }
 
 app.UseCors("FrontendPolicy");
+app.UseStaticFiles(); // serves wwwroot/uploads/** — admin-uploaded product photos
 app.UseAuthentication();
 app.UseAuthorization();
 

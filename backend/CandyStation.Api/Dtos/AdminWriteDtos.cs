@@ -19,6 +19,7 @@ public record ProductWriteDto(
     string Sku,
     string? Weight,
     string[] FlavorTags,
+    string[] Images,
     string CandyColor,
     string Status,
     List<ProductVariantWriteDto> Variants

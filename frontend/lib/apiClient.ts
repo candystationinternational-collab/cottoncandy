@@ -85,6 +85,7 @@ export type Product = {
   sku: string;
   weight: string | null;
   flavorTags: string[];
+  images: string[];
   candyColor: string;
   rating: number;
   reviewCount: number;

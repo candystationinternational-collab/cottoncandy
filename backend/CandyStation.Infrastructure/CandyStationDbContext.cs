@@ -46,6 +46,7 @@ public class CandyStationDbContext(DbContextOptions<CandyStationDbContext> optio
             e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
             e.Property(x => x.Weight).HasMaxLength(20);
             e.Property(x => x.FlavorTags).HasMaxLength(500);
+            e.Property(x => x.Images).HasMaxLength(2000);
             e.Property(x => x.CandyColor).HasMaxLength(9).IsRequired();
             e.Property(x => x.Rating).HasColumnType("decimal(2,1)");
             e.HasOne(x => x.Category).WithMany(c => c.Products).HasForeignKey(x => x.CategoryId);

@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { CandyArt } from "@/lib/candyArt";
 import { formatPrice } from "@/lib/CatalogProvider";
 import type { Product } from "@/lib/apiClient";
@@ -65,7 +66,13 @@ export function FlavorCarousel({ flavors, currentId }: { flavors: Product[]; cur
               f.id === currentId ? "border-pink bg-cream" : "border-navy/10 hover:border-navy/40"
             }`}
           >
-            <CandyArt color={f.candyColor} id={`carousel-${f.id}`} className="h-14 w-14" />
+            {f.images.length > 0 ? (
+              <div className="relative h-14 w-14">
+                <Image src={f.images[0]} alt={f.name} fill unoptimized className="object-contain" />
+              </div>
+            ) : (
+              <CandyArt color={f.candyColor} id={`carousel-${f.id}`} className="h-14 w-14" />
+            )}
             <span className="text-center text-xs font-bold text-navy">{f.name}</span>
             <span className="text-xs text-navy/60">{formatPrice(f.price)}</span>
           </button>

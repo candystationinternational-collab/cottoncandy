@@ -77,6 +77,7 @@ export type ProductWrite = {
   sku: string;
   weight: string | null;
   flavorTags: string[];
+  images: string[];
   candyColor: string;
   status: "active" | "inactive";
   variants: { id?: number; name: string; price: number }[];
@@ -120,6 +121,32 @@ export const adminApi = {
   createProduct: (data: ProductWrite) => request<Product>("/api/admin/products", { method: "POST", body: data }),
   updateProduct: (id: number, data: ProductWrite) => request<Product>(`/api/admin/products/${id}`, { method: "PUT", body: data }),
   deleteProduct: (id: number) => request<void>(`/api/admin/products/${id}`, { method: "DELETE" }),
+
+  // Uploads real product photos to the backend's own storage; returns a full absolute URL
+  // (not the bare "/uploads/xxx.png" the API responds with) so it renders correctly no matter
+  // where it's displayed, since the file physically lives on the API's server, not the frontend's.
+  uploadProductImage: async (file: File): Promise<string> => {
+    const token = getAdminToken();
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch(`${API_URL}/api/admin/uploads`, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: form,
+    });
+    if (!res.ok) {
+      let message = res.statusText;
+      try {
+        const data = await res.json();
+        message = data.message ?? message;
+      } catch {
+        // ignore
+      }
+      throw new ApiError(res.status, message);
+    }
+    const data = (await res.json()) as { url: string };
+    return `${API_URL}${data.url}`;
+  },
 
   // Categories (Admin-only)
   getCategories: () => request<Category[]>("/api/admin/categories"),

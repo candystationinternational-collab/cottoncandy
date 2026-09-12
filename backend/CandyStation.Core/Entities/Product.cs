@@ -25,6 +25,7 @@ public class Product
     public ItemStatus Status { get; set; } = ItemStatus.Active;
     public string? Weight { get; set; }
     public string? FlavorTags { get; set; } // comma-separated
+    public string? Images { get; set; } // comma-separated URLs (relative or absolute); first = primary photo
     public string CandyColor { get; set; } = "#F90264";
     public decimal Rating { get; set; }
     public int ReviewCount { get; set; }

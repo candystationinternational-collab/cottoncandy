@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { CandyArt } from "@/lib/candyArt";
 import { formatPrice } from "@/lib/CatalogProvider";
 import { productEmoji } from "@/lib/emoji";
@@ -30,8 +31,12 @@ export function ProductCard({ product }: { product: Product }) {
       >
         <WhatsAppIcon />
       </a>
-      <div className="mx-auto flex h-40 w-40 items-center justify-center transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
-        <CandyArt color={product.candyColor} id={`card-${product.id}`} className="h-full w-full" />
+      <div className="relative mx-auto flex h-40 w-40 items-center justify-center transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
+        {product.images.length > 0 ? (
+          <Image src={product.images[0]} alt={product.name} fill unoptimized className="object-contain drop-shadow-lg" />
+        ) : (
+          <CandyArt color={product.candyColor} id={`card-${product.id}`} className="h-full w-full" />
+        )}
       </div>
       <div className="mt-4">
         <p className="text-xs font-bold uppercase tracking-wide text-purple">{productEmoji(product.name)} {product.flavorTags[0]}</p>

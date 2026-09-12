@@ -26,7 +26,7 @@ public static class DbInitializer
         var indulgent = categories[3];
 
         Product MakeProduct(string name, Category cat, string desc, string ingredients, int calories,
-            string sku, string tags, string color, decimal rating, int reviews, int stock)
+            string sku, string tags, string color, decimal rating, int reviews, int stock, string? images = null)
         {
             var p = new Product
             {
@@ -44,6 +44,7 @@ public static class DbInitializer
                 Sku = sku,
                 Weight = "50 g / 150 g",
                 FlavorTags = tags,
+                Images = images,
                 CandyColor = color,
                 Rating = rating,
                 ReviewCount = reviews,
@@ -53,29 +54,33 @@ public static class DbInitializer
             return p;
         }
 
+        // Real product photos live in the frontend's /public/product-images — referenced here by
+        // relative path so they resolve against whatever domain the frontend is served from.
+        static string PhotosFor(string flavor) => $"/product-images/{flavor}/1.png,/product-images/{flavor}/2.png,/product-images/{flavor}/3.png";
+
         var strawberry = MakeProduct("Strawberry Dream", fruity,
             "A sweet and fruity treat packed with the delicious taste of strawberries. Light, fluffy, and bursting with flavor, Strawberry Dream is perfect for satisfying your sweet cravings and adding a touch of happiness to any moment.",
             "Sugar, natural strawberry flavoring, food-grade color (E120)", 180, "CS-STR-001", "strawberry,fruity,sweet", "#F90264", 4.8m, 132, 84);
 
         var blueberry = MakeProduct("Blueberry Bliss", fruity,
             "Enjoy the rich and refreshing taste of blueberries in every bite. Blueberry Bliss offers a smooth and delightful experience, making it the perfect companion for parties, movie nights, and celebrations.",
-            "Sugar, natural blueberry flavoring, food-grade color (E133)", 178, "CS-BLU-002", "blueberry,fruity", "#7E02E8", 4.7m, 98, 76);
+            "Sugar, natural blueberry flavoring, food-grade color (E133)", 178, "CS-BLU-002", "blueberry,fruity", "#7E02E8", 4.7m, 98, 76, PhotosFor("blueberry"));
 
         var orange = MakeProduct("Orange Burst", fruity,
             "Bright, vibrant, and full of citrus goodness, Orange Burst delivers a refreshing sweetness that's impossible to resist. Its cheerful flavor makes every occasion extra special.",
-            "Sugar, natural orange flavoring, food-grade color (E160a)", 182, "CS-ORN-003", "orange,citrus,fruity", "#FD7603", 4.6m, 74, 91);
+            "Sugar, natural orange flavoring, food-grade color (E160a)", 182, "CS-ORN-003", "orange,citrus,fruity", "#FD7603", 4.6m, 74, 91, PhotosFor("orange"));
 
         var mint = MakeProduct("Mint Fresh", fresh,
             "Cool, refreshing, and delightfully sweet, Mint Fresh combines a burst of mint flavor with soft cotton candy to create a unique and satisfying treat.",
-            "Sugar, natural mint flavoring, food-grade color (E102)", 175, "CS-MNT-004", "mint,cooling,fresh", "#9DC403", 4.5m, 51, 68);
+            "Sugar, natural mint flavoring, food-grade color (E102)", 175, "CS-MNT-004", "mint,cooling,fresh", "#9DC403", 4.5m, 51, 68, PhotosFor("mint"));
 
         var coffee = MakeProduct("Coffee Delight", indulgent,
             "A perfect choice for coffee lovers, Coffee Delight blends rich coffee notes with a sweet and fluffy texture, creating an indulgent experience in every bite.",
-            "Sugar, natural coffee flavoring, food-grade color (caramel)", 185, "CS-COF-005", "coffee,indulgent", "#6B4226", 4.9m, 143, 60);
+            "Sugar, natural coffee flavoring, food-grade color (caramel)", 185, "CS-COF-005", "coffee,indulgent", "#6B4226", 4.9m, 143, 60, PhotosFor("coffee"));
 
         var vanilla = MakeProduct("Vanilla Bliss", classic,
             "Smooth, creamy, and timeless, Vanilla Bliss offers a classic flavor that everyone loves. Its delicate sweetness and soft texture make it perfect for any occasion.",
-            "Sugar, natural vanilla flavoring", 176, "CS-VAN-006", "vanilla,classic", "#FFF8EE", 4.7m, 112, 100);
+            "Sugar, natural vanilla flavoring", 176, "CS-VAN-006", "vanilla,classic", "#FFF8EE", 4.7m, 112, 100, PhotosFor("vanilla"));
 
         var products = new[] { strawberry, blueberry, orange, mint, coffee, vanilla };
         db.Products.AddRange(products);

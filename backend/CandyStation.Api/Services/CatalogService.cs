@@ -12,6 +12,7 @@ public class CatalogService(CandyStationDbContext db)
         p.Id, p.CategoryId, p.Name, p.Description, p.Ingredients, p.ServingSize, p.Calories,
         p.Fat, p.Carbs, p.Protein, p.Price, p.CompareAtPrice, p.Stock, p.Sku, p.Weight,
         (p.FlavorTags ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+        (p.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
         p.CandyColor, p.Rating, p.ReviewCount,
         p.Variants.OrderBy(v => v.SortOrder).Select(v => new ProductVariantDto(v.Id, v.Name, v.Price)).ToList()
     );

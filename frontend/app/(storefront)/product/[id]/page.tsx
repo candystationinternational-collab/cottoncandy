@@ -36,7 +36,7 @@ export default function ProductDetailPage() {
     <div className="container-cs py-10">
       <div className="grid gap-10 lg:grid-cols-2">
         <div>
-          <ProductShowcase color={product.candyColor} productId={product.id} />
+          <ProductShowcase color={product.candyColor} productId={product.id} images={product.images} />
           <FlavorCarousel flavors={flavorsInCategory} currentId={product.id} />
         </div>
 

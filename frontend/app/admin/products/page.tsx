@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { adminApi, type ProductWrite } from "@/lib/adminApi";
 import { formatPrice } from "@/lib/CatalogProvider";
 import { CandyArt } from "@/lib/candyArt";
@@ -23,6 +24,7 @@ const EMPTY_FORM: ProductWrite = {
   sku: "",
   weight: "50 g / 150 g",
   flavorTags: [],
+  images: [],
   candyColor: "#F90264",
   status: "active",
   variants: [
@@ -38,6 +40,8 @@ export default function AdminProductsPage() {
   const [editingId, setEditingId] = useState<number | null | "new">(null);
   const [form, setForm] = useState<ProductWrite>(EMPTY_FORM);
   const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [urlDraft, setUrlDraft] = useState("");
 
   function load() {
     Promise.all([adminApi.getProducts(), adminApi.getCategories()]).then(([p, c]) => {
@@ -72,6 +76,7 @@ export default function AdminProductsPage() {
       sku: p.sku,
       weight: p.weight,
       flavorTags: p.flavorTags,
+      images: p.images,
       candyColor: p.candyColor,
       status: "active",
       variants: p.variants.map((v) => ({ id: v.id, name: v.name, price: v.price })),
@@ -90,6 +95,33 @@ export default function AdminProductsPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save product.");
     }
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file later
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const url = await adminApi.uploadProductImage(file);
+      setForm((f) => ({ ...f, images: [...f.images, url] }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not upload image.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function addImageUrl() {
+    const url = urlDraft.trim();
+    if (!url) return;
+    setForm((f) => ({ ...f, images: [...f.images, url] }));
+    setUrlDraft("");
+  }
+
+  function removeImage(index: number) {
+    setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== index) }));
   }
 
   async function remove(id: number) {
@@ -132,7 +164,11 @@ export default function AdminProductsPage() {
             {filtered.map((p) => (
               <tr key={p.id} className="border-t border-navy/10">
                 <td className="flex items-center gap-3 px-4 py-3">
-                  <CandyArt color={p.candyColor} id={`admin-${p.id}`} className="h-8 w-8" />
+                  {p.images.length > 0 ? (
+                    <Image src={p.images[0]} alt={p.name} width={32} height={32} unoptimized className="h-8 w-8 rounded-full object-cover" />
+                  ) : (
+                    <CandyArt color={p.candyColor} id={`admin-${p.id}`} className="h-8 w-8" />
+                  )}
                   <span className="font-semibold text-navy">{p.name}</span>
                 </td>
                 <td className="px-4 py-3 text-navy/70">{categories.find((c) => c.id === p.categoryId)?.name}</td>
@@ -218,6 +254,44 @@ export default function AdminProductsPage() {
                   <option value="inactive">Inactive</option>
                 </select>
               </div>
+            </div>
+
+            <div className="mt-5">
+              <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-navy/60">Product Photos</label>
+              {form.images.length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-3">
+                  {form.images.map((url, i) => (
+                    <div key={i} className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-navy/10">
+                      <Image src={url} alt={`Photo ${i + 1}`} fill unoptimized className="object-cover" />
+                      <button
+                        onClick={() => removeImage(i)}
+                        aria-label={`Remove photo ${i + 1}`}
+                        className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-navy/80 text-xs text-white"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="cursor-pointer rounded-full border-2 border-navy px-4 py-2 text-xs font-bold text-navy hover:border-pink hover:text-pink">
+                  {uploading ? "Uploading…" : "Upload Photo"}
+                  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handleFileUpload} disabled={uploading} className="hidden" />
+                </label>
+                <span className="text-xs text-navy/40">or</span>
+                <input
+                  value={urlDraft}
+                  onChange={(e) => setUrlDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addImageUrl())}
+                  placeholder="Paste an image URL"
+                  className="min-w-0 flex-1 rounded-full border-2 border-navy/20 px-4 py-2 text-xs focus:border-pink focus:outline-none"
+                />
+                <button onClick={addImageUrl} className="rounded-full bg-cream px-4 py-2 text-xs font-bold text-navy hover:bg-navy/10">
+                  Add URL
+                </button>
+              </div>
+              {form.images.length === 0 && <p className="mt-2 text-xs text-navy/40">No photos yet — the generated candy-color art will be used instead.</p>}
             </div>
 
             <div className="mt-5">

@@ -77,6 +77,7 @@ public class AdminProductsController(CandyStationDbContext db) : ControllerBase
         product.Sku = req.Sku;
         product.Weight = req.Weight;
         product.FlavorTags = string.Join(",", req.FlavorTags);
+        product.Images = string.Join(",", req.Images.Select(i => i.Trim()).Where(i => i.Length > 0));
         product.CandyColor = req.CandyColor;
         product.Status = req.Status == "inactive" ? ItemStatus.Inactive : ItemStatus.Active;
 

@@ -21,6 +21,7 @@ public record ProductDto(
     string Sku,
     string? Weight,
     string[] FlavorTags,
+    string[] Images,
     string CandyColor,
     decimal Rating,
     int ReviewCount,
