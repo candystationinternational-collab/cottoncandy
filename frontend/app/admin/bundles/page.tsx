@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { adminApi, type BundleWrite } from "@/lib/adminApi";
 import { formatPrice } from "@/lib/CatalogProvider";
 import { CandyArt } from "@/lib/candyArt";
@@ -88,7 +89,13 @@ export default function AdminBundlesPage() {
           <div key={b.id} className="rounded-2xl border-2 border-navy/10 bg-white p-5">
             <div className="flex h-14 items-center -space-x-4">
               {b.items.map((it) => (
-                <CandyArt key={it.productId} color={it.candyColor} id={`admin-bundle-${b.id}-${it.productId}`} className="h-10 w-10" />
+                <div key={it.productId} className="relative h-10 w-10">
+                  {it.images.length > 0 ? (
+                    <Image src={it.images[0]} alt={it.productName} fill unoptimized sizes="40px" className="object-contain" />
+                  ) : (
+                    <CandyArt color={it.candyColor} id={`admin-bundle-${b.id}-${it.productId}`} className="h-full w-full" />
+                  )}
+                </div>
               ))}
             </div>
             <h3 className="mt-3 font-display font-bold text-navy">{b.name}</h3>
@@ -162,7 +169,13 @@ export default function AdminBundlesPage() {
                     return (
                       <div key={p.id} className="flex items-center gap-3">
                         <input type="checkbox" checked={!!item} onChange={() => toggleProduct(p.id)} className="h-4 w-4 accent-pink" />
-                        <CandyArt color={p.candyColor} id={`bundle-picker-${p.id}`} className="h-8 w-8" />
+                        {p.images.length > 0 ? (
+                          <div className="relative h-8 w-8 shrink-0">
+                            <Image src={p.images[0]} alt={p.name} fill unoptimized sizes="32px" className="object-contain" />
+                          </div>
+                        ) : (
+                          <CandyArt color={p.candyColor} id={`bundle-picker-${p.id}`} className="h-8 w-8" />
+                        )}
                         <span className="flex-1 text-sm text-navy">{p.name}</span>
                         {item && (
                           <input

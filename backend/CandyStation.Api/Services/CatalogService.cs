@@ -21,7 +21,11 @@ public class CatalogService(CandyStationDbContext db)
 
     public static BundleDto ToDto(Bundle b) => new(
         b.Id, b.Name, b.Description, b.Price, b.CompareAtPrice,
-        b.Items.Select(i => new BundleItemDto(i.ProductId, i.Product?.Name ?? "", i.Product?.CandyColor ?? "#F90264", i.Quantity)).ToList()
+        b.Items.Select(i => new BundleItemDto(
+            i.ProductId, i.Product?.Name ?? "", i.Product?.CandyColor ?? "#F90264",
+            (i.Product?.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+            i.Quantity
+        )).ToList()
     );
 
     public static DeliveryZoneDto ToDto(DeliveryZone z) => new(z.Id, z.Name, z.Description, z.Cost, z.Enabled);

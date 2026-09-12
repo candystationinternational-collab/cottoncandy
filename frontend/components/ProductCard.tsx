@@ -7,10 +7,19 @@ import { formatPrice } from "@/lib/CatalogProvider";
 import { productEmoji } from "@/lib/emoji";
 import { buildWhatsAppOrderLink } from "@/lib/whatsapp";
 import { WhatsAppIcon } from "@/components/WhatsAppOrderButton";
+import { useCart } from "@/lib/cartStore";
 import type { Product } from "@/lib/apiClient";
 
 export function ProductCard({ product }: { product: Product }) {
+  const { addProduct } = useCart();
   const whatsappHref = buildWhatsAppOrderLink([{ name: product.name, variant: product.variants[0]?.name, quantity: 1 }]);
+
+  function handleAddToCart(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const defaultVariant = product.variants[0];
+    if (defaultVariant) addProduct(product.id, defaultVariant.id, 1);
+  }
 
   return (
     <Link
@@ -31,9 +40,9 @@ export function ProductCard({ product }: { product: Product }) {
       >
         <WhatsAppIcon />
       </a>
-      <div className="relative mx-auto flex h-40 w-40 items-center justify-center transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
+      <div className="relative mx-auto flex h-52 w-52 items-center justify-center transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
         {product.images.length > 0 ? (
-          <Image src={product.images[0]} alt={product.name} fill unoptimized className="object-contain drop-shadow-lg" />
+          <Image src={product.images[0]} alt={product.name} fill unoptimized sizes="208px" className="object-contain drop-shadow-lg" />
         ) : (
           <CandyArt color={product.candyColor} id={`card-${product.id}`} className="h-full w-full" />
         )}
@@ -43,9 +52,13 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="mt-1 font-display text-lg font-bold text-navy">{product.name}</h3>
         <div className="mt-3 flex items-center justify-between">
           <span className="font-display text-xl font-extrabold text-pink">{formatPrice(product.price)}</span>
-          <span className="rounded-full bg-navy px-3 py-1.5 text-xs font-bold text-white transition-colors group-hover:bg-pink">
-            View
-          </span>
+          <button
+            onClick={handleAddToCart}
+            aria-label={`Add ${product.name} to cart`}
+            className="rounded-full bg-navy px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-pink"
+          >
+            Add to Cart
+          </button>
         </div>
       </div>
     </Link>

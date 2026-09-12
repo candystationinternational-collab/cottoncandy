@@ -94,7 +94,7 @@ export type Product = {
 
 export type Category = { id: number; name: string; description: string | null; displayOrder: number };
 
-export type BundleItem = { productId: number; productName: string; candyColor: string; quantity: number };
+export type BundleItem = { productId: number; productName: string; candyColor: string; images: string[]; quantity: number };
 export type Bundle = {
   id: number;
   name: string;

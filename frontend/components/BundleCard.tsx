@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { CandyArt } from "@/lib/candyArt";
 import { formatPrice } from "@/lib/CatalogProvider";
 import { useCart } from "@/lib/cartStore";
@@ -20,9 +21,15 @@ export function BundleCard({ bundle }: { bundle: Bundle }) {
         </span>
       )}
 
-      <div className="flex h-24 items-center -space-x-6">
+      <div className="flex h-28 items-center -space-x-8">
         {bundle.items.map((item) => (
-          <CandyArt key={item.productId} color={item.candyColor} id={`bundle-${bundle.id}-${item.productId}`} className="h-16 w-16" />
+          <div key={item.productId} className="relative h-24 w-24 shrink-0">
+            {item.images.length > 0 ? (
+              <Image src={item.images[0]} alt={item.productName} fill unoptimized sizes="96px" className="object-contain drop-shadow-md" />
+            ) : (
+              <CandyArt color={item.candyColor} id={`bundle-${bundle.id}-${item.productId}`} className="h-full w-full" />
+            )}
+          </div>
         ))}
       </div>
 

@@ -60,7 +60,7 @@ public static class DbInitializer
 
         var strawberry = MakeProduct("Strawberry Dream", fruity,
             "A sweet and fruity treat packed with the delicious taste of strawberries. Light, fluffy, and bursting with flavor, Strawberry Dream is perfect for satisfying your sweet cravings and adding a touch of happiness to any moment.",
-            "Sugar, natural strawberry flavoring, food-grade color (E120)", 180, "CS-STR-001", "strawberry,fruity,sweet", "#F90264", 4.8m, 132, 84);
+            "Sugar, natural strawberry flavoring, food-grade color (E120)", 180, "CS-STR-001", "strawberry,fruity,sweet", "#F90264", 4.8m, 132, 84, PhotosFor("strawberry"));
 
         var blueberry = MakeProduct("Blueberry Bliss", fruity,
             "Enjoy the rich and refreshing taste of blueberries in every bite. Blueberry Bliss offers a smooth and delightful experience, making it the perfect companion for parties, movie nights, and celebrations.",

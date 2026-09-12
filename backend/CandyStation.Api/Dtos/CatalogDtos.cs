@@ -28,7 +28,7 @@ public record ProductDto(
     List<ProductVariantDto> Variants
 );
 
-public record BundleItemDto(int ProductId, string ProductName, string CandyColor, int Quantity);
+public record BundleItemDto(int ProductId, string ProductName, string CandyColor, string[] Images, int Quantity);
 
 public record BundleDto(
     int Id,

@@ -58,10 +58,10 @@ export function ProductShowcase({
   return (
     <div ref={wrapRef} className="relative flex flex-col items-center py-6">
       <div className="relative flex items-center justify-center">
-        <div className="absolute h-72 w-72 rounded-full opacity-15" style={{ backgroundColor: color }} />
-        <div ref={artRef} className="relative h-80 w-80 sm:h-96 sm:w-96">
+        <div className="absolute h-80 w-80 rounded-full opacity-15 sm:h-[26rem] sm:w-[26rem]" style={{ backgroundColor: color }} />
+        <div ref={artRef} className="relative h-96 w-96 sm:h-[28rem] sm:w-[28rem]">
           {activeImage ? (
-            <Image src={activeImage} alt="Product photo" fill unoptimized className="object-contain drop-shadow-xl" />
+            <Image src={activeImage} alt="Product photo" fill unoptimized sizes="(min-width: 640px) 28rem, 24rem" className="object-contain drop-shadow-xl" />
           ) : (
             <CandyArt color={color} id={`showcase-${productId}`} className="h-full w-full drop-shadow-xl" />
           )}

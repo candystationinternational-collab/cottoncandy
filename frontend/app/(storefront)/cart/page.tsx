@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useCart } from "@/lib/cartStore";
 import { useCatalog, formatPrice } from "@/lib/CatalogProvider";
 import { CandyArt } from "@/lib/candyArt";
@@ -41,8 +42,12 @@ export default function CartPage() {
 
               return (
                 <div key={i} className="flex items-center gap-4 rounded-2xl border-2 border-navy/10 p-4">
-                  <div className="h-20 w-20 shrink-0">
-                    <CandyArt color={product.candyColor} id={`cart-${product.id}`} className="h-full w-full" />
+                  <div className="relative h-20 w-20 shrink-0">
+                    {product.images.length > 0 ? (
+                      <Image src={product.images[0]} alt={product.name} fill unoptimized sizes="80px" className="object-contain" />
+                    ) : (
+                      <CandyArt color={product.candyColor} id={`cart-${product.id}`} className="h-full w-full" />
+                    )}
                   </div>
                   <div className="flex-1">
                     <Link href={`/product/${product.id}`} className="font-display font-bold text-navy hover:text-pink">
@@ -68,7 +73,13 @@ export default function CartPage() {
               <div key={i} className="flex items-center gap-4 rounded-2xl border-2 border-navy/10 p-4">
                 <div className="flex h-20 w-20 shrink-0 items-center justify-center -space-x-6">
                   {bundle.items.slice(0, 3).map((it) => (
-                    <CandyArt key={it.productId} color={it.candyColor} id={`cart-bundle-${bundle.id}-${it.productId}`} className="h-10 w-10" />
+                    <div key={it.productId} className="relative h-10 w-10">
+                      {it.images.length > 0 ? (
+                        <Image src={it.images[0]} alt={it.productName} fill unoptimized sizes="40px" className="object-contain" />
+                      ) : (
+                        <CandyArt color={it.candyColor} id={`cart-bundle-${bundle.id}-${it.productId}`} className="h-full w-full" />
+                      )}
+                    </div>
                   ))}
                 </div>
                 <div className="flex-1">

@@ -62,16 +62,16 @@ export function FlavorCarousel({ flavors, currentId }: { flavors: Product[]; cur
           <button
             key={f.id}
             onClick={() => router.push(`/product/${f.id}`)}
-            className={`flex min-w-[110px] flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-colors ${
+            className={`flex min-w-[130px] flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-colors ${
               f.id === currentId ? "border-pink bg-cream" : "border-navy/10 hover:border-navy/40"
             }`}
           >
             {f.images.length > 0 ? (
-              <div className="relative h-14 w-14">
-                <Image src={f.images[0]} alt={f.name} fill unoptimized className="object-contain" />
+              <div className="relative h-20 w-20">
+                <Image src={f.images[0]} alt={f.name} fill unoptimized sizes="80px" className="object-contain" />
               </div>
             ) : (
-              <CandyArt color={f.candyColor} id={`carousel-${f.id}`} className="h-14 w-14" />
+              <CandyArt color={f.candyColor} id={`carousel-${f.id}`} className="h-20 w-20" />
             )}
             <span className="text-center text-xs font-bold text-navy">{f.name}</span>
             <span className="text-xs text-navy/60">{formatPrice(f.price)}</span>
