@@ -25,7 +25,7 @@ export function ProductCard({ product }: { product: Product }) {
     <Link
       href={`/product/${product.id}`}
       data-gsap
-      className="group relative block overflow-hidden rounded-[28px] border-2 border-navy/10 bg-white p-5 transition-transform duration-300 hover:-translate-y-1.5 hover:border-pink"
+      className="group relative block overflow-hidden rounded-[28px] border-2 border-navy/10 bg-white p-3 transition-transform duration-300 hover:-translate-y-1.5 hover:border-pink sm:p-5"
     >
       <div className="absolute right-4 top-4 rounded-full bg-gold px-2.5 py-1 text-xs font-bold text-navy">
         ★ {product.rating}
@@ -40,22 +40,22 @@ export function ProductCard({ product }: { product: Product }) {
       >
         <WhatsAppIcon />
       </a>
-      <div className="relative mx-auto flex h-52 w-52 items-center justify-center transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
+      <div className="relative mx-auto aspect-square w-full max-w-[13rem] transition-transform duration-300 group-hover:scale-105 group-hover:rotate-2">
         {product.images.length > 0 ? (
-          <Image src={product.images[0]} alt={product.name} fill unoptimized sizes="208px" className="object-contain drop-shadow-lg" />
+          <Image src={product.images[0]} alt={product.name} fill unoptimized sizes="(min-width: 768px) 13rem, 40vw" className="object-contain drop-shadow-lg" />
         ) : (
           <CandyArt color={product.candyColor} id={`card-${product.id}`} className="h-full w-full" />
         )}
       </div>
-      <div className="mt-4">
-        <p className="text-xs font-bold uppercase tracking-wide text-purple">{productEmoji(product.name)} {product.flavorTags[0]}</p>
-        <h3 className="mt-1 font-display text-lg font-bold text-navy">{product.name}</h3>
-        <div className="mt-3 flex items-center justify-between">
-          <span className="font-display text-xl font-extrabold text-pink">{formatPrice(product.price)}</span>
+      <div className="mt-3 sm:mt-4">
+        <p className="truncate text-xs font-bold uppercase tracking-wide text-purple">{productEmoji(product.name)} {product.flavorTags[0]}</p>
+        <h3 className="mt-1 truncate font-display text-base font-bold text-navy sm:text-lg">{product.name}</h3>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 sm:mt-3">
+          <span className="font-display text-lg font-extrabold text-pink sm:text-xl">{formatPrice(product.price)}</span>
           <button
             onClick={handleAddToCart}
             aria-label={`Add ${product.name} to cart`}
-            className="rounded-full bg-navy px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-pink"
+            className="rounded-full bg-navy px-2.5 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-pink sm:px-3 sm:text-xs"
           >
             Add to Cart
           </button>
