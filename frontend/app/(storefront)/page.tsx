@@ -7,46 +7,12 @@ import { useCatalog, formatPrice } from "@/lib/CatalogProvider";
 import { CategoryCard } from "@/components/CategoryCard";
 import { ProductCard } from "@/components/ProductCard";
 import { BundleCard } from "@/components/BundleCard";
+import { HeroSlider } from "@/components/HeroSlider";
 import { gsap, prefersReducedMotion } from "@/hooks/useGsap";
 
-const HEADLINE = "Cloud-Soft Cotton Candy";
-
 export default function HomePage() {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const artRef = useRef<HTMLDivElement>(null);
-  const { products, categories, bundles } = useCatalog();
-
-  useEffect(() => {
-    if (prefersReducedMotion()) return;
-    const ctx = gsap.context(() => {
-      gsap.from(".letter-reveal", {
-        y: 46,
-        opacity: 0,
-        duration: 0.7,
-        ease: "power3.out",
-        stagger: 0.03,
-      });
-      gsap.from(".hero-sub", { y: 20, opacity: 0, duration: 0.7, delay: 0.5, ease: "power3.out" });
-      gsap.from(".hero-cta", { y: 20, opacity: 0, duration: 0.7, delay: 0.65, ease: "power3.out" });
-      gsap.fromTo(
-        artRef.current,
-        { opacity: 0, scale: 0.85, rotate: -8 },
-        { opacity: 1, scale: 1, rotate: 0, duration: 1, delay: 0.2, ease: "power3.out" }
-      );
-
-      const onMove = (e: MouseEvent) => {
-        const { innerWidth, innerHeight } = window;
-        const x = (e.clientX / innerWidth - 0.5) * 24;
-        const y = (e.clientY / innerHeight - 0.5) * 24;
-        gsap.to(artRef.current, { x, y, duration: 0.6, ease: "power2.out" });
-      };
-      window.addEventListener("mousemove", onMove);
-
-      return () => window.removeEventListener("mousemove", onMove);
-    }, heroRef);
-
-    return () => ctx.revert();
-  }, []);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const { products, categories, bundles, heroSlides } = useCatalog();
 
   // Re-scanned once catalog data (categories/products/bundles) has arrived and rendered,
   // since these grids don't exist in the DOM yet on the initial mount-time scan above.
@@ -73,7 +39,7 @@ export default function HomePage() {
           scrollTrigger: { trigger: el, start: "top 90%", once: true },
         });
       });
-    }, heroRef);
+    }, pageRef);
 
     return () => ctx.revert();
   }, [products, categories, bundles]);
@@ -81,46 +47,9 @@ export default function HomePage() {
   const featured = products.slice(0, 6);
 
   return (
-    <div>
+    <div ref={pageRef}>
       {/* Hero */}
-      <section ref={heroRef} className="relative overflow-hidden border-b-4 border-navy bg-cream">
-        <div className="container-cs grid items-center gap-10 py-16 md:grid-cols-2 md:py-24">
-          <div>
-            <h1 className="flex flex-wrap font-display text-3xl font-extrabold leading-[1.15] text-navy sm:text-5xl sm:leading-[1.05] lg:text-6xl">
-              {HEADLINE.split(" ").map((word, wi) => (
-                <span key={wi} className="mr-[0.28em] inline-flex last:mr-0">
-                  {word.split("").map((ch, i) => (
-                    <span key={i} className="letter-reveal inline-block">
-                      {ch}
-                    </span>
-                  ))}
-                </span>
-              ))}
-            </h1>
-            <p className="hero-sub mt-6 max-w-md text-lg text-navy/70">
-              Handcrafted flavor clouds made fresh in Nepal. Six signature flavors, zero gradients, 100% happiness.
-            </p>
-            <div className="hero-cta mt-8 flex flex-wrap gap-4">
-              <Link href="/shop" className="rounded-full bg-pink px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-md transition-transform hover:-translate-y-0.5">
-                Shop Flavors
-              </Link>
-              <Link href="/about" className="rounded-full border-2 border-navy px-8 py-4 text-sm font-bold uppercase tracking-wide text-navy transition-transform hover:-translate-y-0.5">
-                Our Story
-              </Link>
-            </div>
-            <div className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-navy bg-white px-4 py-2 text-xs font-bold text-navy">
-              <span className="h-2 w-2 rounded-full bg-lime" /> Cash on Delivery, all across Nepal
-            </div>
-          </div>
-
-          <div className="relative flex items-center justify-center">
-            <div className="absolute h-72 w-72 rounded-full bg-pink/10 sm:h-96 sm:w-96" />
-            <div ref={artRef} className="relative h-72 w-72 sm:h-96 sm:w-96">
-              <CandyArt color="#F90264" id="hero" className="h-full w-full drop-shadow-2xl" />
-            </div>
-          </div>
-        </div>
-      </section>
+      {heroSlides.length > 0 && <HeroSlider slides={heroSlides} />}
 
       {/* Categories */}
       <section className="container-cs py-16">

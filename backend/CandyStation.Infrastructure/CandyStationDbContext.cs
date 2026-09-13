@@ -19,6 +19,7 @@ public class CandyStationDbContext(DbContextOptions<CandyStationDbContext> optio
     public DbSet<OrderTimelineEntry> OrderTimelineEntries => Set<OrderTimelineEntry>();
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
     public DbSet<Settings> Settings => Set<Settings>();
+    public DbSet<HeroSlide> HeroSlides => Set<HeroSlide>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -167,6 +168,18 @@ public class CandyStationDbContext(DbContextOptions<CandyStationDbContext> optio
             e.Property(x => x.CodInstructions).HasMaxLength(500);
             e.Property(x => x.TaxRate).HasColumnType("decimal(5,2)");
             e.Property(x => x.ShippingPolicy).HasMaxLength(2000);
+        });
+
+        b.Entity<HeroSlide>(e =>
+        {
+            e.Property(x => x.BackgroundColor).HasMaxLength(9).IsRequired();
+            e.Property(x => x.ItemType).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.Status).HasConversion<string>().HasMaxLength(20);
+            e.Property(x => x.TitleOverride).HasMaxLength(150);
+            e.Property(x => x.SubtitleOverride).HasMaxLength(500);
+            e.Property(x => x.CtaLabel).HasMaxLength(50);
+            e.HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.Bundle).WithMany().HasForeignKey(x => x.BundleId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

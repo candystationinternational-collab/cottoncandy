@@ -1,7 +1,7 @@
 // Typed fetch wrapper around the /api/admin/* endpoints.
 
 import { getAdminToken, setAdminToken, ApiError } from "@/lib/apiClient";
-import type { Product, Category, Bundle, DeliveryZone, Settings, Order } from "@/lib/apiClient";
+import type { Product, Category, Bundle, DeliveryZone, Settings, Order, HeroSlide } from "@/lib/apiClient";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5080";
 
@@ -96,6 +96,18 @@ export type BundleWrite = {
 
 export type DeliveryZoneWrite = { name: string; description: string | null; cost: number; enabled: boolean };
 
+export type HeroSlideWrite = {
+  itemType: "product" | "bundle";
+  productId: number | null;
+  bundleId: number | null;
+  backgroundColor: string;
+  titleOverride: string | null;
+  subtitleOverride: string | null;
+  ctaLabel: string | null;
+  displayOrder: number;
+  status: "active" | "inactive";
+};
+
 export const adminApi = {
   login: (username: string, password: string) =>
     request<AdminAuthResponse>("/api/admin/auth/login", { method: "POST", body: { username, password } }),
@@ -161,6 +173,14 @@ export const adminApi = {
   createBundle: (data: BundleWrite) => request<Bundle>("/api/admin/bundles", { method: "POST", body: data }),
   updateBundle: (id: number, data: BundleWrite) => request<Bundle>(`/api/admin/bundles/${id}`, { method: "PUT", body: data }),
   deleteBundle: (id: number) => request<void>(`/api/admin/bundles/${id}`, { method: "DELETE" }),
+
+  // Hero slider (Admin-only)
+  getHeroSlides: () => request<HeroSlide[]>("/api/admin/hero-slides"),
+  createHeroSlide: (data: HeroSlideWrite) => request<HeroSlide>("/api/admin/hero-slides", { method: "POST", body: data }),
+  updateHeroSlide: (id: number, data: HeroSlideWrite) => request<HeroSlide>(`/api/admin/hero-slides/${id}`, { method: "PUT", body: data }),
+  reorderHeroSlide: (id: number, displayOrder: number) =>
+    request<HeroSlide>(`/api/admin/hero-slides/${id}/display-order`, { method: "PATCH", body: { displayOrder } }),
+  deleteHeroSlide: (id: number) => request<void>(`/api/admin/hero-slides/${id}`, { method: "DELETE" }),
 
   // Delivery zones (Admin-only)
   getDeliveryZones: () => request<DeliveryZone[]>("/api/admin/delivery-zones"),

@@ -29,3 +29,10 @@ public enum StaffRole
     Admin,
     Delivery,
 }
+
+/// <summary>What a HeroSlide links to — exactly one of the slide's Product/Bundle FKs is set to match.</summary>
+public enum HeroItemType
+{
+    Product,
+    Bundle,
+}

@@ -36,6 +36,34 @@ public class CatalogService(CandyStationDbContext db)
         s.TaxRate, s.ShippingPolicy
     );
 
+    /// <summary>Requires HeroSlide.Product and HeroSlide.Bundle (with Bundle.Items.Product) to be loaded.</summary>
+    public static HeroSlideDto ToDto(HeroSlide h)
+    {
+        var status = h.Status == ItemStatus.Inactive ? "inactive" : "active";
+
+        if (h.ItemType == HeroItemType.Bundle && h.Bundle is not null)
+        {
+            var images = h.Bundle.Items.SelectMany(i => (i.Product?.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)).ToArray();
+            var candyColor = h.Bundle.Items.FirstOrDefault()?.Product?.CandyColor ?? "#F90264";
+            return new HeroSlideDto(
+                h.Id, h.BackgroundColor, "bundle", null, h.BundleId,
+                h.TitleOverride ?? h.Bundle.Name, h.TitleOverride, h.SubtitleOverride ?? h.Bundle.Description, h.SubtitleOverride,
+                h.CtaLabel ?? "Shop Bundles", h.CtaLabel, "/shop", candyColor, images,
+                h.Bundle.Price, h.Bundle.CompareAtPrice, h.DisplayOrder, status
+            );
+        }
+
+        var p = h.Product;
+        return new HeroSlideDto(
+            h.Id, h.BackgroundColor, "product", h.ProductId, null,
+            h.TitleOverride ?? p?.Name ?? "", h.TitleOverride, h.SubtitleOverride ?? p?.Description, h.SubtitleOverride,
+            h.CtaLabel ?? "Shop Now", h.CtaLabel, p is not null ? $"/product/{p.Id}" : "/shop",
+            p?.CandyColor ?? "#F90264",
+            (p?.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+            p?.Price ?? 0, p?.CompareAtPrice, h.DisplayOrder, status
+        );
+    }
+
     public async Task<List<ProductDto>> GetProductsAsync(int? categoryId, string? search, decimal? minPrice,
         decimal? maxPrice, string? tag, string? sort)
     {
@@ -93,5 +121,16 @@ public class CatalogService(CandyStationDbContext db)
     {
         var s = await db.Settings.FirstOrDefaultAsync();
         return s is null ? null : ToDto(s);
+    }
+
+    public async Task<List<HeroSlideDto>> GetHeroSlidesAsync()
+    {
+        var slides = await db.HeroSlides
+            .Include(x => x.Product)
+            .Include(x => x.Bundle).ThenInclude(b => b!.Items).ThenInclude(i => i.Product)
+            .Where(x => x.Status == ItemStatus.Active)
+            .OrderBy(x => x.DisplayOrder)
+            .ToListAsync();
+        return slides.Select(ToDto).ToList();
     }
 }

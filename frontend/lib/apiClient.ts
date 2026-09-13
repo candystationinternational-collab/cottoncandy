@@ -106,6 +106,27 @@ export type Bundle = {
 
 export type DeliveryZone = { id: number; name: string; description: string | null; cost: number; enabled: boolean };
 
+export type HeroSlide = {
+  id: number;
+  backgroundColor: string;
+  itemType: "product" | "bundle";
+  productId: number | null;
+  bundleId: number | null;
+  title: string;
+  titleOverride: string | null;
+  subtitle: string | null;
+  subtitleOverride: string | null;
+  ctaLabel: string;
+  ctaLabelOverride: string | null;
+  linkUrl: string;
+  candyColor: string;
+  images: string[];
+  price: number;
+  compareAtPrice: number | null;
+  displayOrder: number;
+  status: "active" | "inactive";
+};
+
 export type Settings = {
   storeName: string;
   storeAddress: string | null;
@@ -197,6 +218,7 @@ export const apiClient = {
   getBundle: (id: number) => request<Bundle>(`/api/bundles/${id}`),
   getDeliveryZones: () => request<DeliveryZone[]>("/api/delivery-zones"),
   getSettings: () => request<Settings>("/api/settings"),
+  getHeroSlides: () => request<HeroSlide[]>("/api/hero-slides"),
 
   // ---- Auth ----
   register: (name: string, email: string, phone: string, password: string) =>

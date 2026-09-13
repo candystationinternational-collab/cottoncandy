@@ -86,6 +86,15 @@ public static class DbInitializer
         db.Products.AddRange(products);
         db.SaveChanges();
 
+        var familyMegaBox = new Bundle
+        {
+            Name = "Family Mega Box",
+            Description = "One of every flavor — the full Candy Station lineup in one box.",
+            Price = 1000,
+            CompareAtPrice = 1200,
+            Items = products.Select(p => new BundleItem { ProductId = p.Id, Quantity = 1 }).ToList(),
+        };
+
         db.Bundles.AddRange(
             new Bundle
             {
@@ -112,13 +121,34 @@ public static class DbInitializer
                     new BundleItem { ProductId = mint.Id, Quantity = 1 },
                 ],
             },
-            new Bundle
+            familyMegaBox
+        );
+        db.SaveChanges();
+
+        db.HeroSlides.AddRange(
+            new HeroSlide
             {
-                Name = "Family Mega Box",
-                Description = "One of every flavor — the full Candy Station lineup in one box.",
-                Price = 1000,
-                CompareAtPrice = 1200,
-                Items = products.Select(p => new BundleItem { ProductId = p.Id, Quantity = 1 }).ToList(),
+                DisplayOrder = 1,
+                BackgroundColor = "#FFF4F8",
+                ItemType = HeroItemType.Product,
+                ProductId = strawberry.Id,
+                TitleOverride = "Cloud-Soft Cotton Candy",
+                SubtitleOverride = "Handcrafted flavor clouds made fresh in Nepal. Six signature flavors, zero gradients, 100% happiness.",
+                CtaLabel = "Shop Flavors",
+            },
+            new HeroSlide
+            {
+                DisplayOrder = 2,
+                BackgroundColor = "#2D0A31",
+                ItemType = HeroItemType.Bundle,
+                BundleId = familyMegaBox.Id,
+            },
+            new HeroSlide
+            {
+                DisplayOrder = 3,
+                BackgroundColor = "#EAF6FF",
+                ItemType = HeroItemType.Product,
+                ProductId = blueberry.Id,
             }
         );
 

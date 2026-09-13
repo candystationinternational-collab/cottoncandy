@@ -11,6 +11,7 @@ const ADMIN_LINKS = [
   { href: "/admin/products", label: "Products", roles: ["Admin"] },
   { href: "/admin/categories", label: "Categories", roles: ["Admin"] },
   { href: "/admin/bundles", label: "Bundles", roles: ["Admin"] },
+  { href: "/admin/hero-slider", label: "Hero Slider", roles: ["Admin"] },
   { href: "/admin/orders", label: "Orders", roles: ["Admin", "Delivery"] },
   { href: "/admin/customers", label: "Customers", roles: ["Admin"] },
   { href: "/admin/staff", label: "Staff Users", roles: ["Admin"] },

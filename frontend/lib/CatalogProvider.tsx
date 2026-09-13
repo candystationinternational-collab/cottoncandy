@@ -6,6 +6,7 @@ import {
   type Bundle,
   type Category,
   type DeliveryZone,
+  type HeroSlide,
   type Product,
   type Settings,
 } from "@/lib/apiClient";
@@ -16,6 +17,7 @@ type CatalogState = {
   bundles: Bundle[];
   deliveryZones: DeliveryZone[];
   settings: Settings | null;
+  heroSlides: HeroSlide[];
   loading: boolean;
   error: string | null;
 };
@@ -29,6 +31,7 @@ export function CatalogProvider({ children }: { children: React.ReactNode }) {
     bundles: [],
     deliveryZones: [],
     settings: null,
+    heroSlides: [],
     loading: true,
     error: null,
   });
@@ -38,15 +41,16 @@ export function CatalogProvider({ children }: { children: React.ReactNode }) {
 
     async function load() {
       try {
-        const [products, categories, bundles, deliveryZones, settings] = await Promise.all([
+        const [products, categories, bundles, deliveryZones, settings, heroSlides] = await Promise.all([
           apiClient.getProducts(),
           apiClient.getCategories(),
           apiClient.getBundles(),
           apiClient.getDeliveryZones(),
           apiClient.getSettings(),
+          apiClient.getHeroSlides(),
         ]);
         if (!cancelled) {
-          setState({ products, categories, bundles, deliveryZones, settings, loading: false, error: null });
+          setState({ products, categories, bundles, deliveryZones, settings, heroSlides, loading: false, error: null });
         }
       } catch {
         if (!cancelled) {
