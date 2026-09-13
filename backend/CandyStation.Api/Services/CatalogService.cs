@@ -45,10 +45,15 @@ public class CatalogService(CandyStationDbContext db)
         {
             var images = h.Bundle.Items.SelectMany(i => (i.Product?.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)).ToArray();
             var candyColor = h.Bundle.Items.FirstOrDefault()?.Product?.CandyColor ?? "#F90264";
+            var items = h.Bundle.Items.Select(i => new HeroSlideItemDto(
+                i.ProductId, i.Product?.Name ?? "",
+                (i.Product?.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).FirstOrDefault(),
+                i.Product?.CandyColor ?? "#F90264"
+            )).ToArray();
             return new HeroSlideDto(
                 h.Id, h.BackgroundColor, "bundle", null, h.BundleId,
                 h.TitleOverride ?? h.Bundle.Name, h.TitleOverride, h.SubtitleOverride ?? h.Bundle.Description, h.SubtitleOverride,
-                h.CtaLabel ?? "Shop Bundles", h.CtaLabel, "/shop", candyColor, images,
+                h.CtaLabel ?? "Shop Bundles", h.CtaLabel, "/shop", candyColor, images, items,
                 h.Bundle.Price, h.Bundle.CompareAtPrice, h.DisplayOrder, status
             );
         }
@@ -60,6 +65,7 @@ public class CatalogService(CandyStationDbContext db)
             h.CtaLabel ?? "Shop Now", h.CtaLabel, p is not null ? $"/product/{p.Id}" : "/shop",
             p?.CandyColor ?? "#F90264",
             (p?.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+            [],
             p?.Price ?? 0, p?.CompareAtPrice, h.DisplayOrder, status
         );
     }

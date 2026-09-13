@@ -7,7 +7,7 @@ import { CandyArt } from "@/lib/candyArt";
 import type { HeroSlide } from "@/lib/apiClient";
 import { formatPrice, useCatalog } from "@/lib/CatalogProvider";
 import { useCart } from "@/lib/cartStore";
-import { gsap, prefersReducedMotion } from "@/hooks/useGsap";
+import { gsap } from "@/hooks/useGsap";
 
 const AUTO_ADVANCE_MS = 6000;
 
@@ -47,16 +47,17 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
     setActiveIndex(((index % slides.length) + slides.length) % slides.length);
   }
 
-  // Auto-advance, paused on hover and disabled entirely under reduced motion.
+  // Auto-advance, paused on hover. The hero's motion is intentionally always-on (unlike the rest
+  // of the site) regardless of prefers-reduced-motion, per explicit product decision.
   useEffect(() => {
-    if (prefersReducedMotion() || slides.length <= 1 || paused) return;
+    if (slides.length <= 1 || paused) return;
     const t = setInterval(() => setActiveIndex((i) => (i + 1) % slides.length), AUTO_ADVANCE_MS);
     return () => clearInterval(t);
   }, [slides.length, paused]);
 
   // Continuous kid-friendly bounce/wobble loop on the art, running independent of slide changes.
   useEffect(() => {
-    if (prefersReducedMotion() || !bounceRef.current) return;
+    if (!bounceRef.current) return;
     const tween = gsap.to(bounceRef.current, {
       y: -14,
       rotate: 3,
@@ -72,7 +73,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
 
   // Mouse parallax on the whole art stack (same feel as the original static hero).
   useEffect(() => {
-    if (prefersReducedMotion() || !sectionRef.current) return;
+    if (!sectionRef.current) return;
     function onMove(e: MouseEvent) {
       const { innerWidth, innerHeight } = window;
       const x = (e.clientX / innerWidth - 0.5) * 24;
@@ -85,7 +86,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
 
   // Per-slide entrance: headline letters, subtitle, CTA, and a fresh art pop-in.
   useEffect(() => {
-    if (prefersReducedMotion() || !textRef.current) return;
+    if (!textRef.current) return;
     const ctx = gsap.context(() => {
       gsap.from(".letter-reveal", { y: 46, opacity: 0, duration: 0.7, ease: "power3.out", stagger: 0.03 });
       gsap.from(".hero-sub", { y: 20, opacity: 0, duration: 0.7, delay: 0.45, ease: "power3.out" });
@@ -181,11 +182,24 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
         </div>
 
         <div className="relative flex items-center justify-center">
-          <div className="absolute h-72 w-72 rounded-full bg-white/20 sm:h-96 sm:w-96" />
+          <div className="absolute h-72 w-72 rounded-full opacity-15 sm:h-96 sm:w-96" style={{ backgroundColor: slide.candyColor }} />
           <div ref={parallaxRef} className="relative h-72 w-72 sm:h-96 sm:w-96">
             <div ref={bounceRef} className="h-full w-full">
               <div key={slide.id} ref={artRef} className="h-full w-full">
-                {image ? (
+                {slide.itemType === "bundle" && slide.items.length > 0 ? (
+                  <div className="flex h-full w-full flex-wrap content-center items-center justify-center">
+                    {slide.items.slice(0, 6).map((item) => (
+                      <div key={item.productId} className="relative aspect-square w-1/3 p-1.5">
+                        <div className="absolute inset-3 rounded-full opacity-20" style={{ backgroundColor: item.candyColor }} />
+                        {item.image ? (
+                          <Image src={item.image} alt={item.name} fill unoptimized sizes="120px" className="object-contain p-1 drop-shadow-lg" />
+                        ) : (
+                          <CandyArt color={item.candyColor} id={`hero-item-${slide.id}-${item.productId}`} className="h-full w-full drop-shadow-lg" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : image ? (
                   <div className="relative h-full w-full">
                     <Image src={image} alt={slide.title} fill unoptimized sizes="(min-width: 640px) 24rem, 18rem" className="object-contain drop-shadow-2xl" />
                   </div>

@@ -106,6 +106,7 @@ export type Bundle = {
 
 export type DeliveryZone = { id: number; name: string; description: string | null; cost: number; enabled: boolean };
 
+export type HeroSlideItem = { productId: number; name: string; image: string | null; candyColor: string };
 export type HeroSlide = {
   id: number;
   backgroundColor: string;
@@ -121,6 +122,7 @@ export type HeroSlide = {
   linkUrl: string;
   candyColor: string;
   images: string[];
+  items: HeroSlideItem[];
   price: number;
   compareAtPrice: number | null;
   displayOrder: number;

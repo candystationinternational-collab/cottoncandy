@@ -1,5 +1,8 @@
 namespace CandyStation.Api.Dtos;
 
+/// <summary>One flavor within a bundle hero slide, so the hero art can show the whole bundle rather than a single photo.</summary>
+public record HeroSlideItemDto(int ProductId, string Name, string? Image, string CandyColor);
+
 public record HeroSlideDto(
     int Id,
     string BackgroundColor,
@@ -15,6 +18,7 @@ public record HeroSlideDto(
     string LinkUrl,
     string CandyColor,
     string[] Images,
+    HeroSlideItemDto[] Items,
     decimal Price,
     decimal? CompareAtPrice,
     int DisplayOrder,
