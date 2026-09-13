@@ -65,22 +65,24 @@ export default function TrackOrderPage() {
           </div>
 
           {order.status !== "cancelled" && (
-            <div className="mt-8 flex items-center justify-between">
+            <div className="mt-8 flex items-start justify-between">
               {STATUS_STEPS.map((s, i) => (
-                <div key={s} className="flex flex-1 flex-col items-center text-center">
+                <div key={s} className="relative flex flex-1 flex-col items-center px-1 text-center">
+                  {i < STATUS_STEPS.length - 1 && (
+                    <div
+                      className={`absolute left-1/2 top-[17px] h-0.5 w-full ${i < currentIndex ? "bg-lime" : "bg-navy/10"}`}
+                    />
+                  )}
                   <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-full border-2 text-xs font-bold ${
-                      i <= currentIndex ? "border-lime bg-lime text-white" : "border-navy/20 text-navy/30"
+                    className={`relative z-10 flex h-9 w-9 items-center justify-center rounded-full border-2 text-xs font-bold ${
+                      i <= currentIndex ? "border-lime bg-lime text-white" : "border-navy/20 bg-bg text-navy/30"
                     }`}
                   >
                     {i + 1}
                   </div>
-                  <span className={`mt-2 text-[11px] font-semibold ${i <= currentIndex ? "text-navy" : "text-navy/30"}`}>
+                  <span className={`mt-2 text-[10px] font-semibold sm:text-[11px] ${i <= currentIndex ? "text-navy" : "text-navy/30"}`}>
                     {STATUS_LABELS[s]}
                   </span>
-                  {i < STATUS_STEPS.length - 1 && (
-                    <div className={`mt-[-28px] h-0.5 w-full translate-y-[-14px] ${i < currentIndex ? "bg-lime" : "bg-navy/10"}`} />
-                  )}
                 </div>
               ))}
             </div>

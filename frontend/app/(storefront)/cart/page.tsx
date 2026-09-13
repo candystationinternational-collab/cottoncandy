@@ -41,26 +41,30 @@ export default function CartPage() {
               const lineTotal = variant.price * line.quantity;
 
               return (
-                <div key={i} className="flex items-center gap-4 rounded-2xl border-2 border-navy/10 p-4">
-                  <div className="relative h-20 w-20 shrink-0">
-                    {product.images.length > 0 ? (
-                      <Image src={product.images[0]} alt={product.name} fill unoptimized sizes="80px" className="object-contain" />
-                    ) : (
-                      <CandyArt color={product.candyColor} id={`cart-${product.id}`} className="h-full w-full" />
-                    )}
+                <div key={i} className="flex flex-col gap-4 rounded-2xl border-2 border-navy/10 p-4 sm:flex-row sm:items-center">
+                  <div className="flex items-center gap-4">
+                    <div className="relative h-20 w-20 shrink-0">
+                      {product.images.length > 0 ? (
+                        <Image src={product.images[0]} alt={product.name} fill unoptimized sizes="80px" className="object-contain" />
+                      ) : (
+                        <CandyArt color={product.candyColor} id={`cart-${product.id}`} className="h-full w-full" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <Link href={`/product/${product.id}`} className="font-display font-bold text-navy hover:text-pink">
+                        {product.name}
+                      </Link>
+                      <p className="text-sm text-navy/60">{variant.name}</p>
+                      <p className="mt-1 text-sm font-semibold text-navy">{formatPrice(variant.price)}</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <Link href={`/product/${product.id}`} className="font-display font-bold text-navy hover:text-pink">
-                      {product.name}
-                    </Link>
-                    <p className="text-sm text-navy/60">{variant.name}</p>
-                    <p className="mt-1 text-sm font-semibold text-navy">{formatPrice(variant.price)}</p>
+                  <div className="flex items-center justify-between gap-4 sm:justify-end">
+                    <QuantityStepper value={line.quantity} onChange={(q) => updateQuantity(line, q)} />
+                    <div className="text-right font-display font-bold text-pink sm:w-24">{formatPrice(lineTotal)}</div>
+                    <button aria-label={`Remove ${product.name}`} onClick={() => removeLine(line)} className="text-navy/40 hover:text-pink">
+                      ✕
+                    </button>
                   </div>
-                  <QuantityStepper value={line.quantity} onChange={(q) => updateQuantity(line, q)} />
-                  <div className="w-24 text-right font-display font-bold text-pink">{formatPrice(lineTotal)}</div>
-                  <button aria-label={`Remove ${product.name}`} onClick={() => removeLine(line)} className="text-navy/40 hover:text-pink">
-                    ✕
-                  </button>
                 </div>
               );
             }
@@ -70,28 +74,32 @@ export default function CartPage() {
             const lineTotal = bundle.price * line.quantity;
 
             return (
-              <div key={i} className="flex items-center gap-4 rounded-2xl border-2 border-navy/10 p-4">
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center -space-x-6">
-                  {bundle.items.slice(0, 3).map((it) => (
-                    <div key={it.productId} className="relative h-10 w-10">
-                      {it.images.length > 0 ? (
-                        <Image src={it.images[0]} alt={it.productName} fill unoptimized sizes="40px" className="object-contain" />
-                      ) : (
-                        <CandyArt color={it.candyColor} id={`cart-bundle-${bundle.id}-${it.productId}`} className="h-full w-full" />
-                      )}
-                    </div>
-                  ))}
+              <div key={i} className="flex flex-col gap-4 rounded-2xl border-2 border-navy/10 p-4 sm:flex-row sm:items-center">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center -space-x-6">
+                    {bundle.items.slice(0, 3).map((it) => (
+                      <div key={it.productId} className="relative h-10 w-10">
+                        {it.images.length > 0 ? (
+                          <Image src={it.images[0]} alt={it.productName} fill unoptimized sizes="40px" className="object-contain" />
+                        ) : (
+                          <CandyArt color={it.candyColor} id={`cart-bundle-${bundle.id}-${it.productId}`} className="h-full w-full" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-display font-bold text-navy">{bundle.name}</p>
+                    <p className="text-sm text-navy/60">Bundle · {bundle.items.length} flavors</p>
+                    <p className="mt-1 text-sm font-semibold text-navy">{formatPrice(bundle.price)}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-display font-bold text-navy">{bundle.name}</p>
-                  <p className="text-sm text-navy/60">Bundle · {bundle.items.length} flavors</p>
-                  <p className="mt-1 text-sm font-semibold text-navy">{formatPrice(bundle.price)}</p>
+                <div className="flex items-center justify-between gap-4 sm:justify-end">
+                  <QuantityStepper value={line.quantity} onChange={(q) => updateQuantity(line, q)} />
+                  <div className="text-right font-display font-bold text-pink sm:w-24">{formatPrice(lineTotal)}</div>
+                  <button aria-label={`Remove ${bundle.name}`} onClick={() => removeLine(line)} className="text-navy/40 hover:text-pink">
+                    ✕
+                  </button>
                 </div>
-                <QuantityStepper value={line.quantity} onChange={(q) => updateQuantity(line, q)} />
-                <div className="w-24 text-right font-display font-bold text-pink">{formatPrice(lineTotal)}</div>
-                <button aria-label={`Remove ${bundle.name}`} onClick={() => removeLine(line)} className="text-navy/40 hover:text-pink">
-                  ✕
-                </button>
               </div>
             );
           })}
