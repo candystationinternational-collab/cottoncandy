@@ -5,11 +5,26 @@ import Link from "next/link";
 import Image from "next/image";
 import { CandyArt } from "@/lib/candyArt";
 import type { HeroSlide } from "@/lib/apiClient";
+import { formatPrice, useCatalog } from "@/lib/CatalogProvider";
+import { useCart } from "@/lib/cartStore";
 import { gsap, prefersReducedMotion } from "@/hooks/useGsap";
 
 const AUTO_ADVANCE_MS = 6000;
 
+/** True if a hex background is dark enough that navy text/borders would lose contrast. */
+function isDarkColor(hex: string): boolean {
+  const clean = hex.replace("#", "");
+  if (clean.length < 6) return false;
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance < 0.55;
+}
+
 export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
+  const { products } = useCatalog();
+  const { addProduct, addBundle } = useCart();
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [lastSlideCount, setLastSlideCount] = useState(slides.length);
@@ -91,6 +106,25 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   if (!slide) return null;
 
   const image = slide.images[0];
+  const dark = isDarkColor(slide.backgroundColor);
+  const textColor = dark ? "text-white" : "text-navy";
+  const subColor = dark ? "text-white/75" : "text-navy/70";
+  const outlineBtn = dark ? "border-white text-white" : "border-navy text-navy";
+  const dotActive = dark ? "bg-white" : "bg-navy";
+  const dotInactive = dark ? "bg-white/30 hover:bg-white/60" : "bg-navy/25 hover:bg-navy/50";
+  const arrowBtn = dark ? "border-white text-white hover:border-pink hover:text-pink" : "border-navy text-navy hover:border-pink hover:text-pink";
+
+  function handleAddToCart() {
+    if (slide.itemType === "bundle" && slide.bundleId) {
+      addBundle(slide.bundleId, 1);
+      return;
+    }
+    if (slide.productId) {
+      const product = products.find((p) => p.id === slide.productId);
+      const variant = product?.variants[0];
+      if (variant) addProduct(product!.id, variant.id, 1);
+    }
+  }
 
   return (
     <section
@@ -102,7 +136,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
     >
       <div className="container-cs grid items-center gap-10 py-16 md:grid-cols-2 md:py-24">
         <div key={slide.id} ref={textRef}>
-          <h1 className="flex flex-wrap font-display text-3xl font-extrabold leading-[1.15] text-navy sm:text-5xl sm:leading-[1.05] lg:text-6xl">
+          <h1 className={`flex flex-wrap font-display text-3xl font-extrabold leading-[1.15] sm:text-5xl sm:leading-[1.05] lg:text-6xl ${textColor}`}>
             {slide.title.split(" ").map((word, wi) => (
               <span key={wi} className="mr-[0.28em] inline-flex last:mr-0">
                 {word.split("").map((ch, i) => (
@@ -113,23 +147,36 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
               </span>
             ))}
           </h1>
-          {slide.subtitle && <p className="hero-sub mt-6 max-w-md text-lg text-navy/70">{slide.subtitle}</p>}
-          <div className="hero-cta mt-8 flex flex-wrap gap-4">
+          {slide.subtitle && <p className={`hero-sub mt-6 max-w-md text-lg ${subColor}`}>{slide.subtitle}</p>}
+
+          <div className="hero-sub mt-4 flex items-center gap-3">
+            <span className="font-display text-2xl font-extrabold text-pink">{formatPrice(slide.price)}</span>
+            {slide.compareAtPrice && (
+              <span className={`text-sm line-through ${dark ? "text-white/40" : "text-navy/40"}`}>{formatPrice(slide.compareAtPrice)}</span>
+            )}
+          </div>
+
+          <div className="hero-cta mt-6 flex flex-wrap gap-4">
+            <button
+              onClick={handleAddToCart}
+              className="rounded-full bg-pink px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-md transition-transform hover:-translate-y-0.5"
+            >
+              Add to Cart
+            </button>
             <Link
               href={slide.linkUrl}
-              className="rounded-full bg-pink px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-md transition-transform hover:-translate-y-0.5"
+              className={`rounded-full border-2 px-8 py-4 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5 ${outlineBtn}`}
             >
               {slide.ctaLabel}
             </Link>
-            <Link
-              href="/about"
-              className="rounded-full border-2 border-navy px-8 py-4 text-sm font-bold uppercase tracking-wide text-navy transition-transform hover:-translate-y-0.5"
-            >
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <div className="inline-flex items-center gap-2 rounded-full border-2 border-navy bg-white px-4 py-2 text-xs font-bold text-navy">
+              <span className="h-2 w-2 rounded-full bg-lime" /> Cash on Delivery, all across Nepal
+            </div>
+            <Link href="/about" className={`text-xs font-bold uppercase tracking-wide underline underline-offset-4 ${textColor}`}>
               Our Story
             </Link>
-          </div>
-          <div className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-navy bg-white px-4 py-2 text-xs font-bold text-navy">
-            <span className="h-2 w-2 rounded-full bg-lime" /> Cash on Delivery, all across Nepal
           </div>
         </div>
 
@@ -159,7 +206,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
                 key={s.id}
                 aria-label={`Go to slide ${i + 1}`}
                 onClick={() => go(i)}
-                className={`h-2 rounded-full transition-all ${i === activeIndex ? "w-8 bg-navy" : "w-2 bg-navy/25 hover:bg-navy/50"}`}
+                className={`h-2 rounded-full transition-all ${i === activeIndex ? `w-8 ${dotActive}` : `w-2 ${dotInactive}`}`}
               />
             ))}
           </div>
@@ -167,14 +214,14 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
             <button
               aria-label="Previous slide"
               onClick={() => go(activeIndex - 1)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-navy text-navy hover:border-pink hover:text-pink"
+              className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors ${arrowBtn}`}
             >
               ‹
             </button>
             <button
               aria-label="Next slide"
               onClick={() => go(activeIndex + 1)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-navy text-navy hover:border-pink hover:text-pink"
+              className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-colors ${arrowBtn}`}
             >
               ›
             </button>

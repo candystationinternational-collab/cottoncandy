@@ -9,6 +9,7 @@ frontend/next-env.d.ts
 backend/**/bin/
 backend/**/obj/
 backend/publish/
+backend/**/publish/
 backend/remote-logs/
 backend/CandyStation.Api/appsettings.Development.json
 backend/CandyStation.Api/appsettings.Production.json
