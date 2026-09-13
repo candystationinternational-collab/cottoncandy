@@ -27,7 +27,7 @@ export function ProductCard({ product }: { product: Product }) {
       data-gsap
       className="group relative block overflow-hidden rounded-[28px] border-2 border-navy/10 bg-white p-3 transition-transform duration-300 hover:-translate-y-1.5 hover:border-pink sm:p-5"
     >
-      <div className="absolute right-4 top-4 rounded-full bg-gold px-2.5 py-1 text-xs font-bold text-navy">
+      <div className="absolute right-4 top-4 z-10 rounded-full bg-gold px-2.5 py-1 text-xs font-bold text-navy">
         ★ {product.rating}
       </div>
       <a
@@ -36,7 +36,7 @@ export function ProductCard({ product }: { product: Product }) {
         rel="noopener noreferrer"
         onClick={(e) => e.stopPropagation()}
         aria-label={`Order ${product.name} via WhatsApp`}
-        className="absolute left-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-lime text-white transition-transform hover:scale-110"
+        className="absolute left-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-lime text-white transition-transform hover:scale-110"
       >
         <WhatsAppIcon />
       </a>
