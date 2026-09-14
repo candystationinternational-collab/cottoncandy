@@ -55,7 +55,7 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             onClick={handleAddToCart}
             aria-label={`Add ${product.name} to cart`}
-            className="rounded-full bg-navy px-2.5 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-pink sm:px-3 sm:text-xs"
+            className="rounded-full bg-navy px-2.5 py-1.5 text-[11px] font-bold text-white transition-all hover:bg-pink active:scale-90 sm:px-3 sm:text-xs"
           >
             Add to Cart
           </button>

@@ -46,7 +46,7 @@ export function BundleCard({ bundle }: { bundle: Bundle }) {
       <div className="mt-5 flex flex-wrap gap-3">
         <button
           onClick={() => addBundle(bundle.id, 1)}
-          className="flex-1 rounded-full bg-navy px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-pink"
+          className="flex-1 rounded-full bg-navy px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-pink active:scale-95"
         >
           Add Bundle to Cart
         </button>

@@ -72,7 +72,7 @@ export function ProductDetailClient({ slug }: { slug: string }) {
             <QuantityStepper value={qty} onChange={setQty} />
             <button
               onClick={() => addProduct(product.id, variant.id, qty)}
-              className="flex-1 rounded-full bg-navy px-8 py-4 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-pink sm:flex-none"
+              className="flex-1 rounded-full bg-navy px-8 py-4 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-pink active:scale-95 sm:flex-none"
             >
               Add to Cart — {formatPrice(variant.price * qty)}
             </button>

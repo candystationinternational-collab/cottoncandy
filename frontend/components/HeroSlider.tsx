@@ -34,6 +34,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const bounceRef = useRef<HTMLDivElement>(null);
   const artRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const addToCartRef = useRef<HTMLButtonElement>(null);
 
   // Clamp the active slide back in range if the slide list itself changes size (e.g. admin edits).
   if (slides.length !== lastSlideCount) {
@@ -116,6 +117,13 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const arrowBtn = dark ? "border-white text-white hover:border-pink hover:text-pink" : "border-navy text-navy hover:border-pink hover:text-pink";
 
   function handleAddToCart() {
+    if (addToCartRef.current) {
+      gsap.fromTo(
+        addToCartRef.current,
+        { scale: 1 },
+        { scale: 1.18, duration: 0.12, ease: "power1.out", yoyo: true, repeat: 1 }
+      );
+    }
     if (slide.itemType === "bundle" && slide.bundleId) {
       addBundle(slide.bundleId, 1);
       return;
@@ -159,14 +167,15 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
 
           <div className="hero-cta mt-6 flex flex-wrap gap-4">
             <button
+              ref={addToCartRef}
               onClick={handleAddToCart}
-              className="rounded-full bg-pink px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-md transition-transform hover:-translate-y-0.5"
+              className="rounded-full bg-pink px-8 py-4 text-sm font-bold uppercase tracking-wide text-white shadow-md transition-transform hover:-translate-y-0.5 active:scale-95"
             >
               Add to Cart
             </button>
             <Link
               href={slide.linkUrl}
-              className={`rounded-full border-2 px-8 py-4 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5 ${outlineBtn}`}
+              className={`rounded-full border-2 px-8 py-4 text-sm font-bold uppercase tracking-wide transition-transform hover:-translate-y-0.5 active:scale-95 ${outlineBtn}`}
             >
               {slide.ctaLabel}
             </Link>
