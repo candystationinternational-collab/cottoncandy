@@ -94,7 +94,7 @@ export function formatPrice(amount: number): string {
 }
 
 /** Mirrors the backend's OrderRules.MeetsMinimumForSingleItems: bundles are exempt from the
- * minimum order value; carts made up only of single (non-bundle) items must exceed minOrder. */
+ * minimum order value; carts made up only of single (non-bundle) items must reach at least minOrder. */
 export function meetsSingleItemMinimum(subtotal: number, hasBundle: boolean, minOrder: number): boolean {
-  return hasBundle || subtotal > minOrder;
+  return hasBundle || subtotal >= minOrder;
 }

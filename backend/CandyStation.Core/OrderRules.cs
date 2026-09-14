@@ -25,9 +25,9 @@ public static class OrderRules
     public static bool IsWithinCodLimit(decimal total) => total <= CodMaxOrder;
 
     /// <summary>Orders containing any bundle are exempt from the minimum; orders made up only of single
-    /// (non-bundle) items must exceed minOrder to check out.</summary>
+    /// (non-bundle) items must reach at least minOrder to check out.</summary>
     public static bool MeetsMinimumForSingleItems(decimal subtotal, bool hasBundle, decimal minOrder) =>
-        hasBundle || subtotal > minOrder;
+        hasBundle || subtotal >= minOrder;
 
     /// <summary>Cancellation is always allowed from any non-terminal state; forward transitions must follow the sequence.</summary>
     public static bool CanTransition(OrderStatus from, OrderStatus to)
