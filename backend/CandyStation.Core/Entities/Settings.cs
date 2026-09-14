@@ -17,4 +17,10 @@ public class Settings
     public string? CodInstructions { get; set; }
     public decimal TaxRate { get; set; }
     public string? ShippingPolicy { get; set; }
+    public string? PrivacyPolicy { get; set; }
+    public string? TermsOfService { get; set; }
+    public string? ReturnRefundPolicy { get; set; }
+    public string? FacebookUrl { get; set; }
+    public string? InstagramUrl { get; set; }
+    public string? TiktokUrl { get; set; }
 }

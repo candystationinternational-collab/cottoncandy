@@ -41,7 +41,8 @@ public class CatalogService(CandyStationDbContext db)
     public static SettingsDto ToDto(Settings s) => new(
         s.StoreName, s.StoreAddress, s.StorePhone, s.StoreEmail, s.StoreHours, s.Currency,
         s.PickupAddress, s.PickupHours, s.CodEnabled, s.CodMinOrder, s.CodMaxOrder, s.CodInstructions,
-        s.TaxRate, s.ShippingPolicy
+        s.TaxRate, s.ShippingPolicy, s.PrivacyPolicy, s.TermsOfService, s.ReturnRefundPolicy,
+        s.FacebookUrl, s.InstagramUrl, s.TiktokUrl
     );
 
     /// <summary>Requires HeroSlide.Product and HeroSlide.Bundle (with Bundle.Items.Product) to be loaded.</summary>

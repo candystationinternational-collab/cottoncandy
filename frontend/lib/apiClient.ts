@@ -147,6 +147,12 @@ export type Settings = {
   codInstructions: string | null;
   taxRate: number;
   shippingPolicy: string | null;
+  privacyPolicy: string | null;
+  termsOfService: string | null;
+  returnRefundPolicy: string | null;
+  facebookUrl: string | null;
+  instagramUrl: string | null;
+  tiktokUrl: string | null;
 };
 
 export type AuthResponse = { token: string; name: string; email: string };

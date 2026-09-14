@@ -113,6 +113,49 @@ export default function AdminSettingsPage() {
             </div>
           </div>
         </div>
+        <div className="rounded-2xl border-2 border-navy/10 bg-white p-6">
+          <h2 className="mb-4 font-display text-lg font-bold text-navy">Social Media</h2>
+          <p className="mb-3 text-xs text-navy/50">Shown as icons above the site navigation. Leave blank to hide an icon.</p>
+          <div className="space-y-3">
+            <Field label="Facebook URL" value={settings.facebookUrl ?? ""} onChange={(v) => setSettings({ ...settings, facebookUrl: v || null })} />
+            <Field label="Instagram URL" value={settings.instagramUrl ?? ""} onChange={(v) => setSettings({ ...settings, instagramUrl: v || null })} />
+            <Field label="TikTok URL" value={settings.tiktokUrl ?? ""} onChange={(v) => setSettings({ ...settings, tiktokUrl: v || null })} />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border-2 border-navy/10 bg-white p-6 lg:col-span-2">
+          <h2 className="mb-4 font-display text-lg font-bold text-navy">Legal Pages</h2>
+          <p className="mb-3 text-xs text-navy/50">Shown at /policies/privacy-policy, /policies/terms-of-service, and /policies/return-refund-policy, and linked in the footer.</p>
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-navy/60">Privacy Policy</label>
+              <textarea
+                value={settings.privacyPolicy ?? ""}
+                onChange={(e) => setSettings({ ...settings, privacyPolicy: e.target.value })}
+                rows={10}
+                className="w-full rounded-xl border-2 border-navy/20 px-4 py-2.5 font-mono text-xs focus:border-pink focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-navy/60">Terms of Service</label>
+              <textarea
+                value={settings.termsOfService ?? ""}
+                onChange={(e) => setSettings({ ...settings, termsOfService: e.target.value })}
+                rows={10}
+                className="w-full rounded-xl border-2 border-navy/20 px-4 py-2.5 font-mono text-xs focus:border-pink focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-navy/60">Return &amp; Refund Policy</label>
+              <textarea
+                value={settings.returnRefundPolicy ?? ""}
+                onChange={(e) => setSettings({ ...settings, returnRefundPolicy: e.target.value })}
+                rows={10}
+                className="w-full rounded-xl border-2 border-navy/20 px-4 py-2.5 font-mono text-xs focus:border-pink focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <button onClick={saveSettings} className="mt-4 rounded-full bg-pink px-6 py-2.5 text-sm font-bold text-white">

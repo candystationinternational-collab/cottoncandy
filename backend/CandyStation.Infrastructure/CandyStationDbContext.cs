@@ -172,6 +172,12 @@ public class CandyStationDbContext(DbContextOptions<CandyStationDbContext> optio
             e.Property(x => x.CodInstructions).HasMaxLength(500);
             e.Property(x => x.TaxRate).HasColumnType("decimal(5,2)");
             e.Property(x => x.ShippingPolicy).HasMaxLength(2000);
+            e.Property(x => x.PrivacyPolicy).HasColumnType("nvarchar(max)");
+            e.Property(x => x.TermsOfService).HasColumnType("nvarchar(max)");
+            e.Property(x => x.ReturnRefundPolicy).HasColumnType("nvarchar(max)");
+            e.Property(x => x.FacebookUrl).HasMaxLength(300);
+            e.Property(x => x.InstagramUrl).HasMaxLength(300);
+            e.Property(x => x.TiktokUrl).HasMaxLength(300);
         });
 
         b.Entity<HeroSlide>(e =>

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/lib/cartStore";
 import { useAuth } from "@/lib/AuthProvider";
+import { useCatalog } from "@/lib/CatalogProvider";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -21,9 +22,35 @@ export function Navbar() {
   const { count } = useCart();
   const pathname = usePathname();
   const { session } = useAuth();
+  const { settings } = useCatalog();
+
+  const socialLinks = [
+    { href: settings?.facebookUrl, label: "Facebook", icon: <FacebookIcon /> },
+    { href: settings?.instagramUrl, label: "Instagram", icon: <InstagramIcon /> },
+    { href: settings?.tiktokUrl, label: "TikTok", icon: <TiktokIcon /> },
+  ].filter((s) => s.href);
 
   return (
-    <header className="sticky top-0 z-50 border-b-4 border-navy bg-bg/95 backdrop-blur">
+    <>
+      {socialLinks.length > 0 && (
+        <div className="border-b border-navy/10 bg-navy">
+          <div className="container-cs flex h-8 items-center justify-end gap-3">
+            {socialLinks.map((s) => (
+              <a
+                key={s.label}
+                href={s.href!}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Candy Station on ${s.label}`}
+                className="text-white/70 transition-colors hover:text-white"
+              >
+                {s.icon}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+      <header className="sticky top-0 z-50 border-b-4 border-navy bg-bg/95 backdrop-blur">
       <nav className="container-cs flex h-28 items-center justify-between">
         <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
           <Image src="/logo.png" alt="Candy Station" width={96} height={96} className="h-20 w-20 object-contain sm:h-24 sm:w-24" priority />
@@ -99,7 +126,40 @@ export function Navbar() {
           </ul>
         </div>
       )}
-    </header>
+      </header>
+    </>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M15 8.5h2.5V5h-2.5C12.5 5 11 6.6 11 9v2.5H8.5V15H11v6.5h3.5V15h2.6l.4-3.5h-3V9c0-.6.3-.5.5-.5Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="3.5" y="3.5" width="17" height="17" rx="5" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
+      <circle cx="17" cy="7" r="1.1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function TiktokIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M16 3.5c.6 2 2.1 3.4 4 3.6v3a7.2 7.2 0 0 1-4-1.2v5.9a5.4 5.4 0 1 1-5.4-5.4c.3 0 .6 0 .9.1v3.1a2.3 2.3 0 1 0 1.7 2.2V3.5H16Z"
+        fill="currentColor"
+      />
+    </svg>
   );
 }
 

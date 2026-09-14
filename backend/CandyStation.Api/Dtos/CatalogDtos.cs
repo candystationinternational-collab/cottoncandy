@@ -58,5 +58,11 @@ public record SettingsDto(
     decimal CodMaxOrder,
     string? CodInstructions,
     decimal TaxRate,
-    string? ShippingPolicy
+    string? ShippingPolicy,
+    string? PrivacyPolicy,
+    string? TermsOfService,
+    string? ReturnRefundPolicy,
+    string? FacebookUrl,
+    string? InstagramUrl,
+    string? TiktokUrl
 );

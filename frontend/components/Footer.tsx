@@ -63,8 +63,15 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10 py-5 text-center text-xs text-white/50">
-        © {new Date().getFullYear()} Candy Station. All rights reserved.
+      <div className="border-t border-white/10 py-5">
+        <div className="container-cs flex flex-col items-center gap-3 text-center text-xs text-white/50 sm:flex-row sm:justify-between sm:text-left">
+          <p>© {new Date().getFullYear()} Candy Station. All rights reserved.</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            <Link href="/policies/privacy-policy" className="hover:text-pink">Privacy Policy</Link>
+            <Link href="/policies/terms-of-service" className="hover:text-pink">Terms of Service</Link>
+            <Link href="/policies/return-refund-policy" className="hover:text-pink">Return &amp; Refund Policy</Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

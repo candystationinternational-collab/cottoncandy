@@ -38,6 +38,12 @@ public class AdminSettingsController(CandyStationDbContext db) : ControllerBase
         s.CodInstructions = req.CodInstructions;
         s.TaxRate = req.TaxRate;
         s.ShippingPolicy = req.ShippingPolicy;
+        s.PrivacyPolicy = req.PrivacyPolicy;
+        s.TermsOfService = req.TermsOfService;
+        s.ReturnRefundPolicy = req.ReturnRefundPolicy;
+        s.FacebookUrl = req.FacebookUrl;
+        s.InstagramUrl = req.InstagramUrl;
+        s.TiktokUrl = req.TiktokUrl;
 
         await db.SaveChangesAsync();
         return Ok(CatalogService.ToDto(s));
