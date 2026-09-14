@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/lib/cartStore";
-import { useCatalog, formatPrice } from "@/lib/CatalogProvider";
+import { useCatalog, formatPrice, meetsSingleItemMinimum } from "@/lib/CatalogProvider";
 import { useAuth } from "@/lib/AuthProvider";
-import { apiClient, type Order, type ShippingAddress } from "@/lib/apiClient";
+import { apiClient, ApiError, type Order, type ShippingAddress } from "@/lib/apiClient";
 
 type Step = 1 | 2 | 3 | 4 | 5 | 6;
 type AuthChoice = "guest" | "login" | "signup";
@@ -61,6 +61,10 @@ export default function CheckoutPage() {
   const shippingCost = deliveryMethod === "pickup" ? 0 : zone?.cost ?? 0;
   const total = subtotal + shippingCost;
 
+  const hasBundle = lines.some((l) => l.kind === "bundle");
+  const minOrder = settings?.codMinOrder ?? 0;
+  const meetsMinimum = meetsSingleItemMinimum(subtotal, hasBundle, minOrder);
+
   const cartItems = useMemo(
     () =>
       lines.map((line) => {
@@ -101,6 +105,9 @@ export default function CheckoutPage() {
     if (s === 3 && deliveryMethod === "delivery" && !effectiveZoneId) {
       errs.push("Please choose a delivery zone.");
     }
+    if (s === 5 && !meetsMinimum) {
+      errs.push(`Orders of single flavors need a minimum of ${formatPrice(minOrder)} to check out. Add another item, or choose a bundle instead.`);
+    }
     return errs;
   }
 
@@ -128,8 +135,10 @@ export default function CheckoutPage() {
         setOrder(created);
         clear();
         setStep(6);
-      } catch {
-        setErrors(["Could not place your order. Please check your details and try again."]);
+      } catch (err) {
+        setErrors([
+          err instanceof ApiError ? err.message : "Could not place your order. Please check your details and try again.",
+        ]);
       } finally {
         setSubmitting(false);
       }
@@ -349,7 +358,7 @@ export default function CheckoutPage() {
               </button>
               <button
                 onClick={next}
-                disabled={submitting}
+                disabled={submitting || (step === 5 && !meetsMinimum)}
                 className="rounded-full bg-pink px-8 py-3 text-sm font-bold uppercase tracking-wide text-white disabled:opacity-50"
               >
                 {submitting ? "Placing Order…" : step === 5 ? "Place Order" : "Continue"}
@@ -375,6 +384,11 @@ export default function CheckoutPage() {
               <span>Total</span>
               <span>{formatPrice(total)}</span>
             </div>
+            {!meetsMinimum && (
+              <p className="mt-4 rounded-xl border-2 border-pink bg-pink/5 p-3 text-xs text-pink">
+                Orders of single flavors need a minimum of {formatPrice(minOrder)} to check out.
+              </p>
+            )}
           </aside>
         )}
       </div>

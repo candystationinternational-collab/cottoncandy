@@ -516,7 +516,7 @@ public static class DbInitializer
             PickupAddress = "Candy Station Flagship, Durbar Marg, Kathmandu",
             PickupHours = "11:00 AM – 9:00 PM",
             CodEnabled = true,
-            CodMinOrder = 0,
+            CodMinOrder = 400,
             CodMaxOrder = 10000,
             CodInstructions = "Pay in cash to our delivery rider when your order arrives. Please keep exact change ready where possible.",
             TaxRate = 0,

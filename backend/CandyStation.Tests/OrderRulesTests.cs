@@ -47,6 +47,18 @@ public class OrderRulesTests
     }
 
     [Theory]
+    [InlineData(300, false, 400, false)] // single items only, below the minimum
+    [InlineData(400, false, 400, false)] // exactly at the minimum — must exceed, not just meet
+    [InlineData(400.01, false, 400, true)]
+    [InlineData(500, false, 400, true)]
+    [InlineData(300, true, 400, true)] // bundle present — exempt regardless of subtotal
+    [InlineData(200, false, 0, true)] // minimum disabled (0) — any positive subtotal passes
+    public void MeetsMinimumForSingleItems_ExemptsBundlesFromTheMinimum(decimal subtotal, bool hasBundle, decimal minOrder, bool expected)
+    {
+        Assert.Equal(expected, OrderRules.MeetsMinimumForSingleItems(subtotal, hasBundle, minOrder));
+    }
+
+    [Theory]
     [InlineData(OrderStatus.Pending, OrderStatus.Confirmed, true)]
     [InlineData(OrderStatus.Pending, OrderStatus.Preparing, false)] // can't skip a step
     [InlineData(OrderStatus.Confirmed, OrderStatus.Preparing, true)]

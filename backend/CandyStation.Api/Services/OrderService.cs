@@ -110,6 +110,12 @@ public class OrderService(CandyStationDbContext db, IEmailService email, IConfig
         }
 
         var subtotal = OrderRules.CalculateSubtotal(orderItems.Select(i => (i.UnitPrice, i.Quantity)));
+
+        var hasBundle = req.Items.Any(l => l.Kind == "bundle");
+        var minOrder = (await db.Settings.FirstOrDefaultAsync())?.CodMinOrder ?? 0;
+        if (!OrderRules.MeetsMinimumForSingleItems(subtotal, hasBundle, minOrder))
+            throw new OrderValidationException($"Orders with only single items must total more than Rs. {minOrder}. Add another item or choose a bundle to check out.");
+
         var deliveryMethod = req.DeliveryMethod == "pickup" ? DeliveryMethod.Pickup : DeliveryMethod.Delivery;
 
         decimal shipping = 0;

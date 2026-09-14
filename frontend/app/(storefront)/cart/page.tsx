@@ -3,13 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useCart } from "@/lib/cartStore";
-import { useCatalog, formatPrice } from "@/lib/CatalogProvider";
+import { useCatalog, formatPrice, meetsSingleItemMinimum } from "@/lib/CatalogProvider";
 import { CandyArt } from "@/lib/candyArt";
 import { QuantityStepper } from "@/components/QuantityStepper";
 
 export default function CartPage() {
   const { lines, updateQuantity, removeLine, subtotal } = useCart();
-  const { products, bundles } = useCatalog();
+  const { products, bundles, settings } = useCatalog();
+
+  const hasBundle = lines.some((l) => l.kind === "bundle");
+  const minOrder = settings?.codMinOrder ?? 0;
+  const meetsMinimum = meetsSingleItemMinimum(subtotal, hasBundle, minOrder);
 
   if (lines.length === 0) {
     return (
@@ -121,9 +125,19 @@ export default function CartPage() {
             <span>Total</span>
             <span>{formatPrice(subtotal)}</span>
           </div>
+          {!meetsMinimum && (
+            <p className="mt-4 rounded-xl border-2 border-pink bg-pink/5 p-3 text-xs text-pink">
+              Orders of single flavors need a minimum of {formatPrice(minOrder)} to check out. Add another item, or
+              choose a bundle instead.
+            </p>
+          )}
           <Link
-            href="/checkout"
-            className="mt-6 block rounded-full bg-navy py-4 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-pink"
+            href={meetsMinimum ? "/checkout" : "#"}
+            aria-disabled={!meetsMinimum}
+            onClick={(e) => !meetsMinimum && e.preventDefault()}
+            className={`mt-6 block rounded-full py-4 text-center text-sm font-bold uppercase tracking-wide text-white transition-colors ${
+              meetsMinimum ? "bg-navy hover:bg-pink" : "cursor-not-allowed bg-navy/30"
+            }`}
           >
             Proceed to Checkout
           </Link>
