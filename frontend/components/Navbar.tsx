@@ -34,7 +34,7 @@ export function Navbar() {
     <>
       {socialLinks.length > 0 && (
         <div className="border-b border-navy/10 bg-navy">
-          <div className="container-cs flex h-8 items-center justify-end gap-3">
+          <div className="container-cs flex h-11 items-center justify-end gap-4">
             {socialLinks.map((s) => (
               <a
                 key={s.label}
@@ -42,7 +42,7 @@ export function Navbar() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Candy Station on ${s.label}`}
-                className="text-white/70 transition-colors hover:text-white"
+                className="text-white/80 transition-colors hover:text-white"
               >
                 {s.icon}
               </a>
@@ -133,7 +133,7 @@ export function Navbar() {
 
 function FacebookIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M15 8.5h2.5V5h-2.5C12.5 5 11 6.6 11 9v2.5H8.5V15H11v6.5h3.5V15h2.6l.4-3.5h-3V9c0-.6.3-.5.5-.5Z"
         fill="currentColor"
@@ -144,7 +144,7 @@ function FacebookIcon() {
 
 function InstagramIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <rect x="3.5" y="3.5" width="17" height="17" rx="5" stroke="currentColor" strokeWidth="2" />
       <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
       <circle cx="17" cy="7" r="1.1" fill="currentColor" />
@@ -154,7 +154,7 @@ function InstagramIcon() {
 
 function TiktokIcon() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M16 3.5c.6 2 2.1 3.4 4 3.6v3a7.2 7.2 0 0 1-4-1.2v5.9a5.4 5.4 0 1 1-5.4-5.4c.3 0 .6 0 .9.1v3.1a2.3 2.3 0 1 0 1.7 2.2V3.5H16Z"
         fill="currentColor"
