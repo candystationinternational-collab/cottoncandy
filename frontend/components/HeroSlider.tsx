@@ -136,7 +136,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
       style={{ backgroundColor: slide.backgroundColor }}
     >
       <div className="container-cs grid items-center gap-10 py-16 md:grid-cols-2 md:py-24">
-        <div key={slide.id} ref={textRef}>
+        <div key={slide.id} ref={textRef} className="order-2 md:order-1">
           <h1 className={`flex flex-wrap font-display text-3xl font-extrabold leading-[1.15] sm:text-5xl sm:leading-[1.05] lg:text-6xl ${textColor}`}>
             {slide.title.split(" ").map((word, wi) => (
               <span key={wi} className="mr-[0.28em] inline-flex last:mr-0">
@@ -181,7 +181,7 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
           </div>
         </div>
 
-        <div className="relative flex items-center justify-center">
+        <div className="relative order-1 flex items-center justify-center md:order-2">
           <div className="absolute h-72 w-72 rounded-full opacity-15 sm:h-96 sm:w-96" style={{ backgroundColor: slide.candyColor }} />
           <div ref={parallaxRef} className="relative h-72 w-72 sm:h-96 sm:w-96">
             <div ref={bounceRef} className="h-full w-full">
