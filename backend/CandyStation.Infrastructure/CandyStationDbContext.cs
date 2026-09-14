@@ -33,6 +33,10 @@ public class CandyStationDbContext(DbContextOptions<CandyStationDbContext> optio
         b.Entity<Product>(e =>
         {
             e.Property(x => x.Name).HasMaxLength(150).IsRequired();
+            e.Property(x => x.Slug).HasMaxLength(180).IsRequired();
+            e.HasIndex(x => x.Slug).IsUnique();
+            e.Property(x => x.MetaTitle).HasMaxLength(70);
+            e.Property(x => x.MetaDescription).HasMaxLength(160);
             e.Property(x => x.Description).HasMaxLength(2000);
             e.Property(x => x.Ingredients).HasMaxLength(1000);
             e.Property(x => x.ServingSize).HasMaxLength(50);

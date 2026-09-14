@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { useCatalog, formatPrice, useRelatedProducts, useProductsByCategory } from "@/lib/CatalogProvider";
 import { useCart } from "@/lib/cartStore";
 import { productEmoji } from "@/lib/emoji";
@@ -13,11 +13,9 @@ import { WhatsAppOrderButton } from "@/components/WhatsAppOrderButton";
 
 type Tab = "description" | "ingredients" | "nutrition" | "reviews";
 
-export default function ProductDetailPage() {
-  const params = useParams<{ id: string }>();
-  const productId = Number(params.id);
+export function ProductDetailClient({ slug }: { slug: string }) {
   const { products, loading } = useCatalog();
-  const product = products.find((p) => p.id === productId);
+  const product = products.find((p) => p.slug === slug);
 
   const { addProduct } = useCart();
   const [variantId, setVariantId] = useState<number | null>(null);

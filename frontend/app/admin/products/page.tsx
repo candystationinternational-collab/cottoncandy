@@ -10,6 +10,9 @@ import type { Product, Category } from "@/lib/apiClient";
 const EMPTY_FORM: ProductWrite = {
   categoryId: 0,
   name: "",
+  slug: null,
+  metaTitle: null,
+  metaDescription: null,
   description: "",
   ingredients: "",
   servingSize: "50 g",
@@ -62,6 +65,9 @@ export default function AdminProductsPage() {
     setForm({
       categoryId: p.categoryId,
       name: p.name,
+      slug: p.slug,
+      metaTitle: p.metaTitle,
+      metaDescription: p.metaDescription,
       description: p.description,
       ingredients: p.ingredients,
       servingSize: p.servingSize,
@@ -253,6 +259,47 @@ export default function AdminProductsPage() {
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="mt-5 rounded-2xl border-2 border-navy/10 p-4">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wide text-navy/60">SEO</p>
+              <div className="space-y-3">
+                <div>
+                  <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-navy/60">URL Slug</label>
+                  <div className="flex items-center gap-1 rounded-xl border-2 border-navy/20 px-4 py-2.5 text-sm focus-within:border-pink">
+                    <span className="shrink-0 text-navy/40">/product/</span>
+                    <input
+                      value={form.slug ?? ""}
+                      onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                      placeholder="leave blank to auto-generate from name"
+                      className="min-w-0 flex-1 bg-transparent focus:outline-none"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-navy/60">SEO Title (optional)</label>
+                  <input
+                    value={form.metaTitle ?? ""}
+                    onChange={(e) => setForm({ ...form, metaTitle: e.target.value || null })}
+                    placeholder={`${form.name || "Product name"} — Candy Station`}
+                    maxLength={70}
+                    className="w-full rounded-xl border-2 border-navy/20 px-4 py-2.5 text-sm focus:border-pink focus:outline-none"
+                  />
+                  <p className="mt-1 text-right text-[10px] text-navy/40">{(form.metaTitle ?? "").length}/70</p>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold uppercase tracking-wide text-navy/60">SEO Description (optional)</label>
+                  <textarea
+                    value={form.metaDescription ?? ""}
+                    onChange={(e) => setForm({ ...form, metaDescription: e.target.value || null })}
+                    placeholder="Leave blank to use the product description"
+                    rows={2}
+                    maxLength={160}
+                    className="w-full rounded-xl border-2 border-navy/20 px-4 py-2.5 text-sm focus:border-pink focus:outline-none"
+                  />
+                  <p className="mt-1 text-right text-[10px] text-navy/40">{(form.metaDescription ?? "").length}/160</p>
+                </div>
               </div>
             </div>
 

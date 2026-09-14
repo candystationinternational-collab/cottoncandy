@@ -23,7 +23,7 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link
-      href={`/product/${product.id}`}
+      href={`/product/${product.slug}`}
       data-gsap
       className="group relative block overflow-hidden rounded-[28px] border-2 border-navy/10 bg-white p-3 transition-transform duration-300 hover:-translate-y-1.5 hover:border-pink sm:p-5"
     >

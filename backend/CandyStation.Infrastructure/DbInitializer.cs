@@ -31,6 +31,7 @@ public static class DbInitializer
             var p = new Product
             {
                 Name = name,
+                Slug = System.Text.RegularExpressions.Regex.Replace(name.ToLowerInvariant(), @"[^a-z0-9]+", "-").Trim('-'),
                 CategoryId = cat.Id,
                 Description = desc,
                 Ingredients = ingredients,

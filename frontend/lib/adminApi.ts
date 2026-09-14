@@ -63,6 +63,9 @@ export type CustomerAdmin = { id: number; name: string; email: string; phone: st
 export type ProductWrite = {
   categoryId: number;
   name: string;
+  slug: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
   description: string | null;
   ingredients: string | null;
   servingSize: string | null;

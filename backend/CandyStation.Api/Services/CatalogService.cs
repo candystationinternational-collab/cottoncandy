@@ -9,13 +9,21 @@ namespace CandyStation.Api.Services;
 public class CatalogService(CandyStationDbContext db)
 {
     public static ProductDto ToDto(Product p) => new(
-        p.Id, p.CategoryId, p.Name, p.Description, p.Ingredients, p.ServingSize, p.Calories,
+        p.Id, p.CategoryId, p.Name, p.Slug, p.MetaTitle, p.MetaDescription, p.Description, p.Ingredients, p.ServingSize, p.Calories,
         p.Fat, p.Carbs, p.Protein, p.Price, p.CompareAtPrice, p.Stock, p.Sku, p.Weight,
         (p.FlavorTags ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
         (p.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
         p.CandyColor, p.Rating, p.ReviewCount,
         p.Variants.OrderBy(v => v.SortOrder).Select(v => new ProductVariantDto(v.Id, v.Name, v.Price)).ToList()
     );
+
+    /// <summary>URL-safe slug from a product name: lowercase, non-alphanumerics collapsed to single hyphens.</summary>
+    public static string Slugify(string input)
+    {
+        var lowered = input.Trim().ToLowerInvariant();
+        var slug = System.Text.RegularExpressions.Regex.Replace(lowered, @"[^a-z0-9]+", "-").Trim('-');
+        return slug.Length == 0 ? "item" : slug;
+    }
 
     public static CategoryDto ToDto(Category c) => new(c.Id, c.Name, c.Description, c.DisplayOrder);
 
@@ -62,7 +70,7 @@ public class CatalogService(CandyStationDbContext db)
         return new HeroSlideDto(
             h.Id, h.BackgroundColor, "product", h.ProductId, null,
             h.TitleOverride ?? p?.Name ?? "", h.TitleOverride, h.SubtitleOverride ?? p?.Description, h.SubtitleOverride,
-            h.CtaLabel ?? "Shop Now", h.CtaLabel, p is not null ? $"/product/{p.Id}" : "/shop",
+            h.CtaLabel ?? "Shop Now", h.CtaLabel, p is not null ? $"/product/{p.Slug}" : "/shop",
             p?.CandyColor ?? "#F90264",
             (p?.Images ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
             [],
@@ -100,6 +108,15 @@ public class CatalogService(CandyStationDbContext db)
     public async Task<ProductDto?> GetProductAsync(int id)
     {
         var p = await db.Products.Include(x => x.Variants).FirstOrDefaultAsync(x => x.Id == id);
+        return p is null ? null : ToDto(p);
+    }
+
+    /// <summary>Looks up by numeric id when the segment parses as one (legacy links), otherwise by slug.</summary>
+    public async Task<ProductDto?> GetProductByIdOrSlugAsync(string idOrSlug)
+    {
+        var p = int.TryParse(idOrSlug, out var id)
+            ? await db.Products.Include(x => x.Variants).FirstOrDefaultAsync(x => x.Id == id)
+            : await db.Products.Include(x => x.Variants).FirstOrDefaultAsync(x => x.Slug == idOrSlug);
         return p is null ? null : ToDto(p);
     }
 

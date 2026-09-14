@@ -22,4 +22,11 @@ public class ProductsController(CatalogService catalog) : ControllerBase
         var product = await catalog.GetProductAsync(id);
         return product is null ? NotFound() : Ok(product);
     }
+
+    [HttpGet("{slug}")]
+    public async Task<IActionResult> GetBySlug(string slug)
+    {
+        var product = await catalog.GetProductByIdOrSlugAsync(slug);
+        return product is null ? NotFound() : Ok(product);
+    }
 }

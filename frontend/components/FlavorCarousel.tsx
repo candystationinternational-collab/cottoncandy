@@ -20,7 +20,7 @@ export function FlavorCarousel({ flavors, currentId }: { flavors: Product[]; cur
     const nextFlavor = flavors[nextIndex];
 
     if (prefersReducedMotion() || !artRef.current) {
-      router.push(`/product/${nextFlavor.id}`);
+      router.push(`/product/${nextFlavor.slug}`);
       return;
     }
 
@@ -29,7 +29,7 @@ export function FlavorCarousel({ flavors, currentId }: { flavors: Product[]; cur
       opacity: 0,
       duration: 0.25,
       ease: "power2.in",
-      onComplete: () => router.push(`/product/${nextFlavor.id}`),
+      onComplete: () => router.push(`/product/${nextFlavor.slug}`),
     });
   }
 
@@ -61,7 +61,7 @@ export function FlavorCarousel({ flavors, currentId }: { flavors: Product[]; cur
         {flavors.map((f) => (
           <button
             key={f.id}
-            onClick={() => router.push(`/product/${f.id}`)}
+            onClick={() => router.push(`/product/${f.slug}`)}
             className={`flex min-w-[130px] flex-col items-center gap-2 rounded-2xl border-2 p-3 transition-colors ${
               f.id === currentId ? "border-pink bg-cream" : "border-navy/10 hover:border-navy/40"
             }`}

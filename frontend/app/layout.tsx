@@ -15,6 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://candystation.com.np"),
   title: "Candy Station — Premium Cotton Candy",
   description:
     "Candy Station: premium, handcrafted cotton candy in Nepal. Browse fruity, fresh, classic and indulgent flavors, order online, and get it delivered.",

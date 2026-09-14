@@ -5,6 +5,9 @@ public record ProductVariantWriteDto(int? Id, string Name, decimal Price);
 public record ProductWriteDto(
     int CategoryId,
     string Name,
+    string? Slug,
+    string? MetaTitle,
+    string? MetaDescription,
     string? Description,
     string? Ingredients,
     string? ServingSize,

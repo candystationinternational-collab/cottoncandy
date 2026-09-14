@@ -72,6 +72,9 @@ export type Product = {
   id: number;
   categoryId: number;
   name: string;
+  slug: string;
+  metaTitle: string | null;
+  metaDescription: string | null;
   description: string | null;
   ingredients: string | null;
   servingSize: string | null;
@@ -215,6 +218,7 @@ export const apiClient = {
     return request<Product[]>(`/api/products${suffix}`);
   },
   getProduct: (id: number) => request<Product>(`/api/products/${id}`),
+  getProductBySlug: (slug: string) => request<Product>(`/api/products/${slug}`),
   getCategories: () => request<Category[]>("/api/categories"),
   getBundles: () => request<Bundle[]>("/api/bundles"),
   getBundle: (id: number) => request<Bundle>(`/api/bundles/${id}`),

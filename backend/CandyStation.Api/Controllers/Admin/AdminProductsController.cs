@@ -33,6 +33,7 @@ public class AdminProductsController(CandyStationDbContext db) : ControllerBase
     {
         var product = new Product();
         Apply(product, req);
+        product.Slug = await ResolveSlugAsync(null, req.Slug, req.Name);
         db.Products.Add(product);
         await db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, CatalogService.ToDto(product));
@@ -44,9 +45,25 @@ public class AdminProductsController(CandyStationDbContext db) : ControllerBase
         var product = await db.Products.Include(p => p.Variants).FirstOrDefaultAsync(p => p.Id == id);
         if (product is null) return NotFound();
         Apply(product, req);
+        product.Slug = await ResolveSlugAsync(id, req.Slug, req.Name);
         product.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
         return Ok(CatalogService.ToDto(product));
+    }
+
+    /// <summary>Uses the admin-supplied slug if given, otherwise derives one from the name; appends
+    /// -2, -3, etc. on collision with another product (excludeId is the product being updated, if any).</summary>
+    private async Task<string> ResolveSlugAsync(int? excludeId, string? requestedSlug, string name)
+    {
+        var baseSlug = CatalogService.Slugify(string.IsNullOrWhiteSpace(requestedSlug) ? name : requestedSlug);
+        var slug = baseSlug;
+        var suffix = 2;
+        while (await db.Products.AnyAsync(p => p.Slug == slug && p.Id != (excludeId ?? -1)))
+        {
+            slug = $"{baseSlug}-{suffix}";
+            suffix++;
+        }
+        return slug;
     }
 
     [HttpDelete("{id:int}")]
@@ -63,6 +80,8 @@ public class AdminProductsController(CandyStationDbContext db) : ControllerBase
     {
         product.CategoryId = req.CategoryId;
         product.Name = req.Name;
+        product.MetaTitle = string.IsNullOrWhiteSpace(req.MetaTitle) ? null : req.MetaTitle.Trim();
+        product.MetaDescription = string.IsNullOrWhiteSpace(req.MetaDescription) ? null : req.MetaDescription.Trim();
         product.Description = req.Description;
         product.Ingredients = req.Ingredients;
         product.ServingSize = req.ServingSize;
